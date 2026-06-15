@@ -410,31 +410,35 @@ select.field-input option{background:var(--surface2)}
 .send-success h3{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--c-green);margin-bottom:10px}
 .send-success p{color:var(--muted);font-size:.875rem;line-height:1.7;margin-bottom:28px}
 @media(max-width:860px){.service-cats{grid-template-columns:1fr}}
-.inscr-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(14px);z-index:400;display:none;align-items:center;justify-content:center;padding:20px}
+.inscr-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(14px);z-index:400;display:none;align-items:center;justify-content:center;padding:14px}
 .inscr-overlay.open{display:flex;animation:fadeIn .2s ease}
-.inscr-modal{background:var(--surface);border:1px solid rgba(255,255,255,.09);border-radius:28px;padding:36px 32px 28px;max-width:440px;width:100%;max-height:calc(100vh - 40px);overflow-y:auto;position:relative;animation:stepIn .3s ease both;text-align:center}
+.inscr-modal{background:var(--surface);border:1px solid rgba(255,255,255,.09);border-radius:24px;padding:28px 26px 22px;max-width:420px;width:100%;max-height:calc(100vh - 28px);overflow-y:auto;position:relative;animation:stepIn .3s ease both;text-align:center;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+.inscr-modal::-webkit-scrollbar{width:6px}
+.inscr-modal::-webkit-scrollbar-track{background:transparent}
+.inscr-modal::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:100px}
+.inscr-modal::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.28)}
 .inscr-modal-close{position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);border-radius:50%;width:32px;height:32px;cursor:pointer;color:var(--muted);font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .inscr-modal-close:hover{border-color:rgba(255,255,255,.25);color:var(--text)}
-.inscr-modal-icon{font-size:2.2rem;margin-bottom:10px}
-.inscr-modal h2{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:8px;letter-spacing:-.3px}
-.inscr-modal-sub{color:var(--muted);font-size:.82rem;line-height:1.6;margin-bottom:16px}
+.inscr-modal-icon{font-size:1.9rem;margin-bottom:8px}
+.inscr-modal h2{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:6px;letter-spacing:-.3px;line-height:1.3}
+.inscr-modal-sub{color:var(--muted);font-size:.8rem;line-height:1.55;margin-bottom:14px}
 .inscr-type-pill{display:inline-flex;align-items:center;gap:7px;border-radius:100px;padding:5px 16px;font-size:.75rem;font-weight:600;margin:0 auto 16px}
 .inscr-type-pill.salud{background:rgba(94,245,176,.1);color:var(--c-green);border:1px solid rgba(94,245,176,.25)}
 .inscr-type-pill.tech{background:rgba(157,127,245,.1);color:var(--c-violet);border:1px solid rgba(157,127,245,.25)}
-.correo-display-box{border-radius:18px;padding:16px 20px;margin-bottom:16px;border:2px solid}
+.correo-display-box{border-radius:16px;padding:12px 18px;margin-bottom:12px;border:2px solid}
 .correo-display-box.salud{background:rgba(94,245,176,.05);border-color:rgba(94,245,176,.3)}
 .correo-display-box.tech{background:rgba(157,127,245,.05);border-color:rgba(157,127,245,.3)}
 .correo-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px;font-weight:500}
-.correo-address{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;letter-spacing:-.3px;margin-bottom:14px;word-break:break-all}
+.correo-address{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;letter-spacing:-.3px;margin-bottom:10px;word-break:break-all}
 .correo-display-box.salud .correo-address{color:var(--c-green)}
 .correo-display-box.tech .correo-address{color:var(--c-violet)}
 .correo-copy-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:100px;padding:8px 20px;font-size:.8rem;font-family:'DM Sans',sans-serif;color:var(--text);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
 .correo-copy-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
-.correo-instrucciones{text-align:left;display:flex;flex-direction:column;gap:8px;margin-bottom:16px;background:var(--surface2);border-radius:14px;padding:14px 18px}
-.ci-row{display:flex;align-items:flex-start;gap:12px;font-size:.82rem;color:var(--muted);line-height:1.5}
+.correo-instrucciones{text-align:left;display:flex;flex-direction:column;gap:6px;margin-bottom:12px;background:var(--surface2);border-radius:12px;padding:12px 16px}
+.ci-row{display:flex;align-items:flex-start;gap:10px;font-size:.78rem;color:var(--muted);line-height:1.45}
 .ci-num{min-width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--text);flex-shrink:0;margin-top:1px}
 .ci-row strong{color:var(--text)}
-.inscr-gmail-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;border-radius:100px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.95rem;text-decoration:none;transition:all .2s;margin-bottom:10px}
+.inscr-gmail-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;border-radius:100px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.9rem;text-decoration:none;transition:all .2s;margin-bottom:10px}
 .inscr-gmail-btn.salud{background:var(--c-green);color:#000}
 .inscr-gmail-btn.tech{background:var(--c-violet);color:#fff}
 .inscr-gmail-btn:hover:not([data-disabled="true"]){opacity:.88;transform:translateY(-1px)}
@@ -1324,8 +1328,6 @@ select.field-input option{background:var(--surface2)}
     document.getElementById('inscr-icon').textContent = esSalud ? '🩺' : '💻';
     document.getElementById('inscr-titulo').textContent = esSalud ? 'Inscripción · Kinesiología & Salud' : 'Inscripción · Servicio Técnico & TI';
     document.getElementById('inscr-sub').innerHTML = esSalud ? 'Envíanos un correo con tu nombre, RUT, especialidad y adjunta tu título o certificado de la Superintendencia de Salud.' : 'Envíanos un correo con tu nombre, área de especialidad y adjunta tu CV o documento que acredite tu formación en informática.';
-    document.getElementById('inscr-pill').className = 'inscr-type-pill ' + tipo;
-    document.getElementById('inscr-pill').innerHTML = esSalud ? '🩺 Profesional de Salud' : '💻 Técnico en Informática';
     document.getElementById('correo-display-box').className = 'correo-display-box ' + tipo;
     document.getElementById('inscr-gmail-btn').className = 'inscr-gmail-btn ' + tipo;
     const asunto = encodeURIComponent(esSalud ? '[Nexo] Inscripción Kinesiología & Salud – Mi nombre' : '[Nexo] Inscripción Técnico Informática – Mi nombre');
@@ -1351,10 +1353,14 @@ select.field-input option{background:var(--surface2)}
     }
     document.getElementById('inscr-overlay').classList.add('open');
     document.body.style.overflow = 'hidden';
+    const activePage = document.querySelector('.page.active');
+    if (activePage) activePage.style.overflow = 'hidden';
   };
   window.cerrarModalCorreo = function() {
     document.getElementById('inscr-overlay').classList.remove('open');
     document.body.style.overflow = '';
+    const activePage = document.querySelector('.page.active');
+    if (activePage) activePage.style.overflow = '';
   };
   window.irAlTestDesdeModal = function() {
     window.cerrarModalCorreo();
@@ -1391,7 +1397,7 @@ select.field-input option{background:var(--surface2)}
 <!-- Modales -->
 <div class="wa-modal-overlay" id="wa-modal-overlay" onclick="if(event.target===this)window.closeWaModal()"><div class="wa-modal"><div class="wa-modal-icon">💬</div><h3>Solicitar por WhatsApp</h3><p class="wa-modal-desc">Te conectaremos con un profesional verificado para este servicio. El pago queda retenido hasta que estés conforme.</p><div class="wa-service-pill" id="wa-service-name"></div><p style="font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:20px" id="wa-service-desc"></p><div class="wa-modal-btns"><a id="wa-btn-go" href="#" target="_blank" class="btn-green" style="justify-content:center;text-decoration:none" onclick="window.closeWaModal()">📱 Abrir WhatsApp →</a><button class="wa-btn-cancel" onclick="window.closeWaModal()">Cancelar</button></div></div></div>
 <div class="send-overlay" id="send-overlay"><div class="send-box"><div id="send-loading"><div class="send-spinner-big"></div><h3>Enviando tu registro</h3><p id="send-loading-text">Estamos enviando tus datos al equipo de Nexo para verificación.</p></div><div id="send-success-box" style="display:none"><div class="send-success-icon">✅</div><h3 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--c-green);margin-bottom:10px">🎉 Registro enviado</h3><p>Tus datos y documentos llegaron al equipo de Nexo. Revisaremos tu solicitud en <strong>24–48 horas</strong> y te notificaremos por correo cuando tu perfil esté activo.</p><div style="background:var(--surface2);border-radius:14px;padding:16px;margin-bottom:24px;font-size:.8rem;color:var(--muted)"><div>📧 Notificación enviada al equipo</div><div>📂 Documentos en revisión</div><div>⏳ Activación en 24–48 hrs</div></div><button class="btn-violet" style="width:100%;justify-content:center" onclick="window.closeSendOverlay()">Entendido →</button></div></div></div>
-<div class="inscr-overlay" id="inscr-overlay" onclick="if(event.target===this)window.cerrarModalCorreo()"><div class="inscr-modal"><button class="inscr-modal-close" onclick="window.cerrarModalCorreo()">✕</button><div class="inscr-modal-icon" id="inscr-icon">📋</div><h2 id="inscr-titulo">Inscripción profesional</h2><p class="inscr-modal-sub" id="inscr-sub">Envíanos un correo con tu nombre, especialidad y adjunta tu CV o documento de formación.</p><div class="inscr-type-pill" id="inscr-pill">🩺 Profesional de Salud</div><div class="correo-display-box" id="correo-display-box"><div class="correo-label">Escríbenos a</div><div class="correo-address" id="correo-address">contact.us.nexo@gmail.com</div><button class="correo-copy-btn" onclick="window.copiarCorreo()"><span id="copy-icon">📋</span> <span id="copy-text">Copiar correo</span></button></div><div class="correo-instrucciones"><div class="ci-row"><span class="ci-num">1</span><span>En el <strong>asunto</strong> escribe tu nombre y área</span></div><div class="ci-row"><span class="ci-num">2</span><span>Adjunta tu <strong>CV o certificado de estudios</strong></span></div><div class="ci-row"><span class="ci-num">3</span><span>Cuéntanos brevemente tu <strong>experiencia</strong></span></div><div class="ci-row"><span class="ci-num">4</span><span>Te respondemos en <strong>24–48 horas</strong></span></div></div><div class="inscr-test-aviso" id="inscr-test-aviso">🔒 Debes completar el <strong>test de nivel</strong> (Junior/Mid/Senior) antes de enviar tu inscripción.<button onclick="window.irAlTestDesdeModal()" style="display:block;width:100%;margin-top:10px;background:var(--c-violet);color:#fff;border:none;border-radius:100px;padding:10px 16px;cursor:pointer">✏️ Ir al test de nivel ahora →</button></div><div class="inscr-test-ok" id="inscr-test-ok"></div><a class="inscr-gmail-btn" id="inscr-gmail-btn" href="#" target="_blank">✉️ Abrir Gmail y enviar correo</a><button class="inscr-modal-cancel" onclick="window.cerrarModalCorreo()">Cerrar</button></div></div>
+<div class="inscr-overlay" id="inscr-overlay" onclick="if(event.target===this)window.cerrarModalCorreo()"><div class="inscr-modal"><button class="inscr-modal-close" onclick="window.cerrarModalCorreo()">✕</button><div class="inscr-modal-icon" id="inscr-icon">📋</div><h2 id="inscr-titulo">Inscripción profesional</h2><p class="inscr-modal-sub" id="inscr-sub">Envíanos un correo con tu nombre, especialidad y adjunta tu CV o documento de formación.</p><div class="correo-display-box" id="correo-display-box"><div class="correo-label">Escríbenos a</div><div class="correo-address" id="correo-address">contact.us.nexo@gmail.com</div><button class="correo-copy-btn" onclick="window.copiarCorreo()"><span id="copy-icon">📋</span> <span id="copy-text">Copiar correo</span></button></div><div class="correo-instrucciones"><div class="ci-row"><span class="ci-num">1</span><span>En el <strong>asunto</strong> escribe tu nombre y área</span></div><div class="ci-row"><span class="ci-num">2</span><span>Adjunta tu <strong>CV o certificado de estudios</strong></span></div><div class="ci-row"><span class="ci-num">3</span><span>Cuéntanos brevemente tu <strong>experiencia</strong></span></div><div class="ci-row"><span class="ci-num">4</span><span>Te respondemos en <strong>24–48 horas</strong></span></div></div><div class="inscr-test-aviso" id="inscr-test-aviso">🔒 Debes completar el <strong>test de nivel</strong> (Junior/Mid/Senior) antes de enviar tu inscripción.<button onclick="window.irAlTestDesdeModal()" style="display:block;width:100%;margin-top:10px;background:var(--c-violet);color:#fff;border:none;border-radius:100px;padding:10px 16px;cursor:pointer">✏️ Ir al test de nivel ahora →</button></div><div class="inscr-test-ok" id="inscr-test-ok"></div><a class="inscr-gmail-btn" id="inscr-gmail-btn" href="#" target="_blank">✉️ Abrir Gmail y enviar correo</a><button class="inscr-modal-cancel" onclick="window.cerrarModalCorreo()">Cerrar</button></div></div>
 
 </body>
 </html>
