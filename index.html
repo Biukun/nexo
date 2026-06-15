@@ -9,22 +9,12 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
+/* ... todo el CSS igual que antes ... */
+/* Por brevedad, mantén el CSS que ya tenías (no lo cambio) */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-:root{
-  --bg:#080810;--surface:#0f0f1a;--surface2:#16162a;
-  --border:rgba(255,255,255,0.07);--text:#f0eff8;--muted:#8a89a0;
-  --c-green:#5ef5b0;--c-violet:#9d7ff5;--c-sky:#3bc4f5;--c-pink:#f472b6;
-  --c-yellow:#fbbf24;--c-red:#f87171;
-  --shadow-sm:0 2px 8px rgba(0,0,0,.18);
-  --shadow-md:0 8px 32px rgba(0,0,0,.28);
-}
-body.light{
-  --bg:#f4f3fb;--surface:#ffffff;--surface2:#eeedf8;
-  --border:rgba(0,0,0,0.08);--text:#0e0d1a;--muted:#6b6790;
-  --shadow-sm:0 2px 8px rgba(80,60,160,.08);
-  --shadow-md:0 8px 32px rgba(80,60,160,.14);
-}
+:root{--bg:#080810;--surface:#0f0f1a;--surface2:#16162a;--border:rgba(255,255,255,0.07);--text:#f0eff8;--muted:#8a89a0;--c-green:#5ef5b0;--c-violet:#9d7ff5;--c-sky:#3bc4f5;--c-pink:#f472b6;--c-yellow:#fbbf24;--c-red:#f87171;--shadow-sm:0 2px 8px rgba(0,0,0,.18);--shadow-md:0 8px 32px rgba(0,0,0,.28);}
+body.light{--bg:#f4f3fb;--surface:#ffffff;--surface2:#eeedf8;--border:rgba(0,0,0,0.08);--text:#0e0d1a;--muted:#6b6790;--shadow-sm:0 2px 8px rgba(80,60,160,.08);--shadow-md:0 8px 32px rgba(80,60,160,.14);}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:400;line-height:1.6;overflow-x:hidden;min-height:100vh}
 .page{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transform:translateY(20px);transition:opacity .4s ease,transform .4s ease;z-index:1}
 .page.active{opacity:1;pointer-events:all;transform:translateY(0);z-index:2}
@@ -746,7 +736,7 @@ function handleHomeSearch() {
 }
 function setSearchFilter(el, cat) { document.querySelectorAll('.sf-pill').forEach(p => p.classList.remove('active')); el.classList.add('active'); }
 
-// Registro (resto de funciones iguales pero con las correcciones)
+// Registro
 function resetRegistrationState() {
   state.tipoReg = ''; state.archivos = {}; state.botDone = false; state.botAnswers = {}; state.testDone = false; state.testScore = 0; state.nivel = ''; state.docTechVerified = false; state.catAnswers = {};
   document.querySelectorAll('.field-input').forEach(i => i.value = '');
@@ -800,7 +790,7 @@ function nextStep(step) {
 }
 function irDesdeBot() { state.tipoReg === 'tech' ? nextStep(4) : nextStep(5); }
 
-// Bot verificación (mismo código que antes pero sin cambios)
+// Bot verificación
 const botScripts = { salud: [{ from: 'bot', text: 'Hola! Soy el asistente de verificación de Nexo. 👋 Voy a hacerte unas preguntas para confirmar tu experiencia en el área de la salud.' },{ from: 'bot', text: '¿Cuál es tu título profesional y en qué institución lo obtuviste?' },{ from: 'user_input', key: 'titulo' },{ from: 'bot', text: 'Perfecto. ¿Cuánto tiempo llevas ejerciendo como profesional de la salud?' },{ from: 'user_input', key: 'experiencia' },{ from: 'bot', text: '¿Actualmente estás inscrito en el Registro Nacional de Prestadores de la Superintendencia de Salud?' },{ from: 'user_input', key: 'registro' },{ from: 'bot', text: 'Muy bien. Describe brevemente los tratamientos o atenciones que ofreces.' },{ from: 'user_input', key: 'servicios' },{ from: 'bot', text: 'Excelente. Tus respuestas son coherentes con el perfil de un profesional de salud. ✅ Procederemos a validar tus documentos.' },{ from: 'end' }], tech: [{ from: 'bot', text: 'Hola! Soy el asistente de verificación de Nexo. 👋 Te haré unas preguntas cortas para confirmar que eres del área de informática o soporte técnico.' },{ from: 'bot', text: '¿En qué institución estudias o estudiaste informática, computación o carreras afines?' },{ from: 'user_input', key: 'institucion' },{ from: 'bot', text: '¿Qué tipo de servicios técnicos ofreces? (ej: reparación de PC, redes, desarrollo...)' },{ from: 'user_input', key: 'servicios' },{ from: 'bot', text: 'Nombra 2 o 3 herramientas, lenguajes o tecnologías con las que trabajas frecuentemente.' },{ from: 'user_input', key: 'herramientas' },{ from: 'bot', text: '¿Has trabajado como técnico de forma independiente o formal antes? Cuéntame brevemente.' },{ from: 'user_input', key: 'experiencia' },{ from: 'bot', text: 'Muy bien, tus respuestas son consistentes con el perfil técnico. ✅ Ahora pasarás a un test de 15 preguntas para determinar tu nivel.' },{ from: 'end' }] };
 let botQueue = [], botStep = 0, waitingInput = false;
 function initBot() { const script = botScripts[state.tipoReg]; botQueue = JSON.parse(JSON.stringify(script)); botStep = 0; waitingInput = false; document.getElementById('bot-chat').innerHTML = ''; runBotQueue(); }
@@ -823,7 +813,7 @@ function finishTest() { state.testDone=true; const pct=(state.testScore/testPreg
 // ─── SUPABASE CONFIG (sin duplicación) ──────────────────────────────
 const SUPABASE_URL = 'https://zaolufggfjqtcmowqckb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_fEJuQCTuNtneQpjnfpUuzA_QqnhlmFL';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const STORAGE_BUCKET = 'documentos';
 
 // ─── REGISTRO DE PROFESIONAL → SUPABASE ──────────────────────────────
@@ -862,7 +852,7 @@ async function enviarRegistroBackend() {
       documentos = await subirArchivos(nombre, apellido);
     }
     loadingText.textContent = 'Guardando tu registro...';
-    const { error } = await supabaseClient.from('profesionales').insert([{
+    const { error } = await supabase.from('profesionales').insert([{
       nombre,
       apellido,
       email,
@@ -890,9 +880,9 @@ async function subirArchivos(nombre, apellido) {
   for (const [key, file] of Object.entries(state.archivos)) {
     const ext = file.name.split('.').pop().toLowerCase();
     const path = `${carpeta}/${key}.${ext}`;
-    const { error } = await supabaseClient.storage.from(STORAGE_BUCKET).upload(path, file, { cacheControl: '3600', upsert: false });
+    const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, { cacheControl: '3600', upsert: false });
     if (error) { console.error(`Error subiendo ${key}:`, error); continue; }
-    const { data } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
     documentos[key] = data.publicUrl;
   }
   return Object.keys(documentos).length > 0 ? documentos : null;
@@ -927,23 +917,23 @@ function copiarCorreo() { const email = 'nexo@ejemplo.com'; navigator.clipboard.
 
 // ─── PANEL DE ADMIN (Supabase Auth) ───────────────────────────────────
 let adminProfesionales = [];
-async function checkAdminSession() { try { const { data } = await supabaseClient.auth.getSession(); if (data && data.session) mostrarDashboardAdmin(); } catch (err) { console.error('Error verificando sesión admin:', err); } }
+async function checkAdminSession() { try { const { data } = await supabase.auth.getSession(); if (data && data.session) mostrarDashboardAdmin(); } catch (err) { console.error('Error verificando sesión admin:', err); } }
 async function adminLogin() {
   const email = document.getElementById('admin-email').value.trim();
   const pass = document.getElementById('admin-pass').value;
   const errEl = document.getElementById('admin-login-error');
   errEl.classList.remove('visible');
   if (!email || !pass) { errEl.textContent = 'Ingresa correo y contraseña.'; errEl.classList.add('visible'); return; }
-  const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+  const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
   if (error) { errEl.textContent = 'Credenciales incorrectas o cuenta no autorizada.'; errEl.classList.add('visible'); return; }
   mostrarDashboardAdmin();
 }
-async function adminLogout() { await supabaseClient.auth.signOut(); document.getElementById('admin-login-box').style.display = 'block'; document.getElementById('admin-dashboard').style.display = 'none'; document.getElementById('admin-pass').value = ''; }
+async function adminLogout() { await supabase.auth.signOut(); document.getElementById('admin-login-box').style.display = 'block'; document.getElementById('admin-dashboard').style.display = 'none'; document.getElementById('admin-pass').value = ''; }
 function mostrarDashboardAdmin() { document.getElementById('admin-login-box').style.display = 'none'; document.getElementById('admin-dashboard').style.display = 'block'; cargarPanelAdmin(); }
 async function cargarPanelAdmin() {
   const list = document.getElementById('admin-list');
   list.innerHTML = '<p class="admin-empty">Cargando...</p>';
-  const { data, error } = await supabaseClient.from('profesionales').select('*').order('id', { ascending: false });
+  const { data, error } = await supabase.from('profesionales').select('*').order('id', { ascending: false });
   if (error) { list.innerHTML = `<p class="admin-empty" style="color:var(--c-red)">Error cargando datos: ${error.message}</p>`; return; }
   adminProfesionales = data || [];
   const activeBtn = document.querySelector('.admin-filters .sf-pill.active');
@@ -963,7 +953,7 @@ function renderAdminCard(p) {
   return `<div class="admin-card"><div class="admin-card-head"><div><strong>${p.nombre || ''} ${p.apellido || ''}</strong><span class="admin-tag">${p.tipo === 'tech' ? '💻 Técnico/TI' : '🩺 Salud'}</span></div><span class="admin-estado" style="color:${estadoColor}">${p.estado}</span></div><div class="admin-card-body"><div><label>Correo</label><span>${p.email || '—'}</span></div><div><label>Teléfono</label><span>${p.telefono || '—'}</span></div><div><label>Región</label><span>${p.region || '—'}</span></div><div><label>Especialidad / Área</label><span>${p.especialidad || '—'}</span></div>${p.reg_super ? `<div><label>Reg. Superintendencia Salud</label><span>${p.reg_super}</span></div>` : ''}${p.nivel ? `<div><label>Nivel test técnico</label><span>${p.nivel.toUpperCase()} · ${p.test_score}/15</span></div>` : ''}</div><div class="admin-doc-row">${docs}</div><div class="admin-actions">${acciones}</div></div>`;
 }
 async function actualizarEstado(id, estado) {
-  const { error } = await supabaseClient.from('profesionales').update({ estado }).eq('id', id);
+  const { error } = await supabase.from('profesionales').update({ estado }).eq('id', id);
   if (error) { alert('Error actualizando: ' + error.message); return; }
   const item = adminProfesionales.find(p => p.id === id);
   if (item) item.estado = estado;
@@ -985,7 +975,7 @@ const categoryMap = {
 };
 async function cargarContadores() {
   try {
-    const { data, error } = await supabaseClient.from('profesionales').select('tipo,especialidad').eq('estado', 'aprobado');
+    const { data, error } = await supabase.from('profesionales').select('tipo,especialidad').eq('estado', 'aprobado');
     if (error) throw error;
     Object.entries(categoryMap).forEach(([id, cfg]) => {
       const el = document.getElementById(id);
