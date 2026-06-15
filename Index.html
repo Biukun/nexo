@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexo · Conecta con expertos verificados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+:root{
+  --bg:#080810;--surface:#0f0f1a;--surface2:#16162a;
+  --border:rgba(255,255,255,0.07);--text:#f0eff8;--muted:#8a89a0;
+  --c-green:#5ef5b0;--c-violet:#9d7ff5;--c-sky:#3bc4f5;--c-pink:#f472b6;
+  --c-yellow:#fbbf24;--c-red:#f87171;
+  --shadow-sm:0 2px 8px rgba(0,0,0,.18);
+  --shadow-md:0 8px 32px rgba(0,0,0,.28);
+}
+body.light{
+  --bg:#f4f3fb;--surface:#ffffff;--surface2:#eeedf8;
+  --border:rgba(0,0,0,0.08);--text:#0e0d1a;--muted:#6b6790;
+  --shadow-sm:0 2px 8px rgba(80,60,160,.08);
+  --shadow-md:0 8px 32px rgba(80,60,160,.14);
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:400;line-height:1.6;overflow-x:hidden;min-height:100vh}
+.page{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transform:translateY(20px);transition:opacity .4s ease,transform .4s ease;z-index:1}
+.page.active{opacity:1;pointer-events:all;transform:translateY(0);z-index:2}
+.page.exit{opacity:0;transform:translateY(-16px);pointer-events:none;z-index:1}
+.blob{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;animation:bdrift 16s ease-in-out infinite alternate}
+@keyframes bdrift{from{transform:translate(0,0)}to{transform:translate(20px,15px)}}
+.home-blobs .blob:nth-child(1){width:560px;height:560px;background:var(--c-green);top:-180px;left:-140px;opacity:.09}
+.home-blobs .blob:nth-child(2){width:460px;height:460px;background:var(--c-violet);bottom:-130px;right:-100px;opacity:.1;animation-delay:-6s}
+.client-blobs .blob:nth-child(1){width:480px;height:480px;background:var(--c-green);top:-150px;right:-100px;opacity:.1}
+.client-blobs .blob:nth-child(2){width:320px;height:320px;background:var(--c-sky);bottom:10%;left:-80px;opacity:.07;animation-delay:-7s}
+.pro-blobs .blob:nth-child(1){width:480px;height:480px;background:var(--c-violet);top:-150px;left:-110px;opacity:.1}
+.pro-blobs .blob:nth-child(2){width:320px;height:320px;background:var(--c-pink);bottom:8%;right:-80px;opacity:.07;animation-delay:-8s}
+.reg-blobs .blob:nth-child(1){width:420px;height:420px;background:var(--c-violet);top:-130px;right:-80px;opacity:.09}
+.reg-blobs .blob:nth-child(2){width:300px;height:300px;background:var(--c-green);bottom:10%;left:-60px;opacity:.07;animation-delay:-5s}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+.topnav{position:sticky;top:0;z-index:100;background:rgba(8,8,16,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+.topnav-inner{height:62px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.45rem;background:linear-gradient(135deg,var(--c-green),var(--c-violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer;user-select:none}
+.nav-back{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:.85rem;cursor:pointer;border:1px solid var(--border);border-radius:100px;padding:7px 16px;transition:all .2s;background:transparent;font-family:'DM Sans',sans-serif}
+.nav-back:hover{color:var(--text);border-color:rgba(255,255,255,.18)}
+.slabel{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:10px}
+.slabel.g{color:var(--c-green)}.slabel.v{color:var(--c-violet)}
+h2.sh{font-family:'Syne',sans-serif;font-size:clamp(1.7rem,3.5vw,2.6rem);font-weight:800;letter-spacing:0;line-height:1.2;margin-bottom:12px}
+p.ssub{color:var(--muted);font-size:.95rem;max-width:520px;line-height:1.75;margin-bottom:48px}
+.fu{opacity:0;transform:translateY(22px);transition:opacity .5s ease,transform .5s ease}
+.fu.vis{opacity:1;transform:translateY(0)}
+.btn-green{display:inline-flex;align-items:center;gap:8px;background:var(--c-green);color:#000;border:none;padding:15px 32px;border-radius:100px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;font-size:.95rem;transition:all .2s;text-decoration:none}
+.btn-green:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(94,245,176,.22)}
+.btn-violet{display:inline-flex;align-items:center;gap:8px;background:var(--c-violet);color:#fff;border:none;padding:15px 32px;border-radius:100px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;font-size:.95rem;transition:all .2s;text-decoration:none}
+.btn-violet:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(157,127,245,.25)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text);border:1px solid var(--border);padding:14px 28px;border-radius:100px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:400;font-size:.9rem;transition:all .2s}
+.btn-ghost:hover{border-color:rgba(255,255,255,.22)}
+.theme-btn{background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:7px 14px;cursor:pointer;font-size:.8rem;color:var(--muted);font-family:'DM Sans',sans-serif;transition:all .25s;display:flex;align-items:center;gap:6px}
+.theme-btn:hover{color:var(--text);border-color:rgba(255,255,255,.18)}
+body.light .theme-btn:hover{border-color:rgba(0,0,0,.18)}
+.home-search-wrap{width:100%;max-width:640px;margin:0 auto 20px;position:relative}
+.home-search-inner{display:flex;align-items:center;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:6px 6px 6px 22px;transition:border-color .25s;box-shadow:var(--shadow-sm)}
+.home-search-inner:focus-within{border-color:rgba(94,245,176,.4)}
+.home-search-icon{font-size:1rem;color:var(--muted);flex-shrink:0;margin-right:4px}
+.home-search-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;padding:6px 0}
+.home-search-input::placeholder{color:var(--muted)}
+.home-search-btn{background:var(--c-green);color:#000;border:none;border-radius:100px;padding:10px 22px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.home-search-btn:hover{transform:scale(1.04)}
+.search-filters{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:48px}
+.sf-pill{background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:.78rem;color:var(--muted);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.sf-pill:hover{border-color:rgba(94,245,176,.35);color:var(--c-green)}
+.sf-pill.active{background:rgba(94,245,176,.1);border-color:rgba(94,245,176,.4);color:var(--c-green);font-weight:500}
+.dest-section{padding:0 0 80px}
+.dest-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px}
+.dest-header h2{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-.3px}
+.dest-header span{font-size:.78rem;color:var(--muted);border:1px solid var(--border);border-radius:100px;padding:4px 14px}
+.dest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.dest-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px 20px;display:flex;flex-direction:column;gap:12px;transition:all .28s;cursor:default;position:relative;overflow:hidden}
+.dest-card::before{content:'';position:absolute;inset:0;border-radius:20px;opacity:0;transition:opacity .3s;pointer-events:none}
+.dest-card.green::before{background:radial-gradient(ellipse at 0% 0%,rgba(94,245,176,.09),transparent 65%)}
+.dest-card.violet::before{background:radial-gradient(ellipse at 100% 0%,rgba(157,127,245,.1),transparent 65%)}
+.dest-card.sky::before{background:radial-gradient(ellipse at 50% 0%,rgba(59,196,245,.09),transparent 65%)}
+.dest-card:hover{transform:translateY(-5px)}
+.dest-card:hover::before{opacity:1}
+.dest-card.green:hover{border-color:rgba(94,245,176,.3)}
+.dest-card.violet:hover{border-color:rgba(157,127,245,.3)}
+.dest-card.sky:hover{border-color:rgba(59,196,245,.3)}
+.dest-avatar-wrap{position:relative;width:fit-content}
+.dest-avatar{width:58px;height:58px;border-radius:50%;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:2rem;border:2px solid var(--border)}
+.dest-avatar.green{border-color:rgba(94,245,176,.4);background:rgba(94,245,176,.07)}
+.dest-avatar.violet{border-color:rgba(157,127,245,.4);background:rgba(157,127,245,.07)}
+.dest-avatar.sky{border-color:rgba(59,196,245,.4);background:rgba(59,196,245,.07)}
+.dest-badge{position:absolute;bottom:-2px;right:-4px;font-size:.65rem;border-radius:100px;padding:2px 8px;font-weight:600;white-space:nowrap}
+.dest-badge.green{background:rgba(94,245,176,.15);color:var(--c-green);border:1px solid rgba(94,245,176,.3)}
+.dest-badge.violet{background:rgba(157,127,245,.15);color:var(--c-violet);border:1px solid rgba(157,127,245,.3)}
+.dest-badge.sky{background:rgba(59,196,245,.15);color:var(--c-sky);border:1px solid rgba(59,196,245,.3)}
+.dest-name{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;margin-bottom:1px}
+.dest-role{font-size:.78rem;color:var(--muted);line-height:1.4}
+.dest-stars{font-size:.75rem;color:var(--c-yellow);letter-spacing:.04em}
+.dest-stats{display:flex;gap:12px;margin-top:4px}
+.dest-stat{font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:4px}
+.dest-stat strong{color:var(--text);font-size:.78rem}
+.dest-tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
+.dest-tag{font-size:.65rem;border-radius:100px;padding:2px 9px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.cats-section{padding:0 0 80px;border-top:1px solid var(--border)}
+.cats-intro{padding-top:64px;margin-bottom:40px}
+.cats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.cat-block{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 18px;transition:all .25s;position:relative;overflow:hidden}
+.cat-block::after{content:'';position:absolute;inset:0;border-radius:16px;background:linear-gradient(135deg,var(--cat-clr,transparent) 0%,transparent 70%);opacity:0;transition:opacity .3s;pointer-events:none}
+.cat-block:hover{transform:translateY(-4px);border-color:var(--cat-clr,var(--border))}
+.cat-block:hover::after{opacity:.06}
+.cat-block-ico{font-size:1.8rem;margin-bottom:10px}
+.cat-block h4{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:800;margin-bottom:5px}
+.cat-block p{font-size:.73rem;color:var(--muted);line-height:1.5}
+.cat-block-count{font-size:.65rem;border-radius:100px;padding:2px 9px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);display:inline-block;margin-top:10px}
+.how-section{padding:0 0 80px;border-top:1px solid var(--border)}
+.how-intro{padding-top:64px;margin-bottom:40px}
+.how-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.how-steps::before{content:'';position:absolute;top:28px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--border) 20%,var(--border) 80%,transparent);z-index:0}
+.how-step{text-align:center;padding:0 12px;position:relative;z-index:1}
+.how-step-dot{width:56px;height:56px;border-radius:50%;border:2px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;transition:all .3s}
+.how-step:hover .how-step-dot{border-color:var(--c-green);transform:scale(1.1)}
+.how-step h4{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:800;margin-bottom:6px}
+.how-step p{font-size:.76rem;color:var(--muted);line-height:1.6}
+.pro-banner{background:linear-gradient(135deg,rgba(157,127,245,.08),rgba(94,245,176,.06));border:1px solid rgba(157,127,245,.2);border-radius:24px;padding:40px 44px;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;margin-bottom:80px}
+.pro-banner-text h3{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-.3px;margin-bottom:6px}
+.pro-banner-text p{color:var(--muted);font-size:.875rem;line-height:1.65;max-width:420px}
+.pro-banner-text .mini-checks{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px}
+.mini-check{font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:5px}
+.mini-check::before{content:'✓';color:var(--c-violet);font-weight:700}
+body.light .home-blobs .blob:nth-child(1){opacity:.05}
+body.light .home-blobs .blob:nth-child(2){opacity:.06}
+body.light .topnav{background:rgba(244,243,251,.9)}
+body.light .choice-card.client-card{background:linear-gradient(145deg,rgba(94,245,176,.12),rgba(94,245,176,.05))}
+body.light .choice-card.pro-card{background:linear-gradient(145deg,rgba(157,127,245,.12),rgba(157,127,245,.05))}
+body.light .dest-card{box-shadow:var(--shadow-sm)}
+body.light .home-search-inner{box-shadow:0 2px 16px rgba(80,60,160,.1)}
+@media(max-width:900px){.dest-grid{grid-template-columns:1fr 1fr}.cats-grid{grid-template-columns:1fr 1fr}.how-steps{grid-template-columns:1fr 1fr;gap:24px}.how-steps::before{display:none}}
+@media(max-width:600px){.dest-grid{grid-template-columns:1fr}.cats-grid{grid-template-columns:1fr 1fr}.how-steps{grid-template-columns:1fr}.pro-banner{flex-direction:column;padding:28px 20px}.pro-banner-text{text-align:center}.pro-banner-text .mini-checks{justify-content:center}}
+.home-hero{min-height:calc(100vh - 62px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 0 60px}
+.home-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:100px;padding:6px 18px;margin-bottom:40px;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.home-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--c-green);animation:pulse 2s infinite}
+.home-badge span{color:var(--c-green);font-weight:500}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.home-hero h1{font-family:'Syne',sans-serif;font-size:clamp(3rem,8vw,6.5rem);font-weight:800;line-height:1.05;letter-spacing:-1px;margin-bottom:24px}
+.word-nexo{background:linear-gradient(135deg,var(--c-green) 0%,var(--c-sky) 50%,var(--c-violet) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.home-sub{max-width:520px;color:var(--muted);font-size:1.05rem;line-height:1.75;margin:0 auto 64px}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:760px;width:100%;margin:0 auto 56px}
+.choice-card{border-radius:24px;padding:44px 36px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;border:1px solid transparent;text-align:left}
+.choice-card::before{content:'';position:absolute;inset:0;border-radius:24px;opacity:0;transition:opacity .3s}
+.choice-card:hover{transform:translateY(-6px)}
+.choice-card:hover::before{opacity:1}
+.client-card{background:linear-gradient(145deg,rgba(94,245,176,.08),rgba(94,245,176,.03));border-color:rgba(94,245,176,.2)}
+.client-card::before{background:radial-gradient(ellipse at 0% 0%,rgba(94,245,176,.12),transparent 65%)}
+.client-card:hover{border-color:rgba(94,245,176,.45);box-shadow:0 20px 60px rgba(94,245,176,.1)}
+.pro-card{background:linear-gradient(145deg,rgba(157,127,245,.08),rgba(157,127,245,.03));border-color:rgba(157,127,245,.2)}
+.pro-card::before{background:radial-gradient(ellipse at 100% 0%,rgba(157,127,245,.12),transparent 65%)}
+.pro-card:hover{border-color:rgba(157,127,245,.45);box-shadow:0 20px 60px rgba(157,127,245,.1)}
+.card-emoji{font-size:2.8rem;margin-bottom:20px;display:block}
+.choice-card h2{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:10px;letter-spacing:-.3px;line-height:1.25}
+.client-card h2{color:var(--c-green)}.pro-card h2{color:var(--c-violet)}
+.choice-card p{color:var(--muted);font-size:.875rem;line-height:1.65;margin-bottom:28px}
+.card-cta{display:inline-flex;align-items:center;gap:8px;border-radius:100px;padding:11px 22px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:.875rem;transition:all .2s;border:none;cursor:pointer}
+.client-card .card-cta{background:var(--c-green);color:#000}
+.pro-card .card-cta{background:var(--c-violet);color:#fff}
+.card-cta-arrow{transition:transform .2s}
+.choice-card:hover .card-cta-arrow{transform:translateX(4px)}
+.home-footer-note{color:var(--muted);font-size:.78rem;display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center}
+.client-hero{padding:80px 0 60px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.eyebrow-g{display:inline-flex;align-items:center;gap:8px;background:rgba(94,245,176,.08);border:1px solid rgba(94,245,176,.2);border-radius:100px;padding:5px 14px;margin-bottom:24px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--c-green);font-weight:500}
+.eyebrow-v{display:inline-flex;align-items:center;gap:8px;background:rgba(157,127,245,.08);border:1px solid rgba(157,127,245,.2);border-radius:100px;padding:5px 14px;margin-bottom:24px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--c-violet);font-weight:500}
+.client-hero-text h1,.pro-hero-text h1{font-family:'Syne',sans-serif;font-size:clamp(2.2rem,4.5vw,3.8rem);font-weight:800;line-height:1.15;letter-spacing:-.5px;margin-bottom:20px}
+.client-hero-text p,.pro-hero-text p{color:var(--muted);font-size:1rem;line-height:1.75;margin-bottom:36px;max-width:440px}
+.client-hero-visual,.pro-benefits{display:flex;flex-direction:column;gap:12px}
+.mini-service-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:14px;transition:all .25s;animation:floatIn .5s ease both}
+.mini-service-card:hover{border-color:rgba(94,245,176,.25);transform:translateX(6px)}
+@keyframes floatIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.ms-icon{font-size:1.4rem;width:40px;flex-shrink:0;text-align:center}
+.ms-info h5{font-family:'Syne',sans-serif;font-size:.875rem;font-weight:700}
+.ms-info span{font-size:.78rem;color:var(--muted)}
+.ms-badge{margin-left:auto;font-size:.7rem;border-radius:100px;padding:3px 10px;background:rgba(94,245,176,.1);color:var(--c-green);white-space:nowrap;flex-shrink:0}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.step-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px 24px;transition:all .25s}
+.step-card:hover{border-color:rgba(94,245,176,.2);transform:translateY(-3px)}
+.step-num-big{font-family:'Syne',sans-serif;font-size:3rem;font-weight:800;color:rgba(94,245,176,.12);line-height:1;margin-bottom:20px}
+.step-card h4{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:8px}
+.step-card p{font-size:.82rem;color:var(--muted);line-height:1.65}
+.escrow-section{padding:80px 0;border-top:1px solid var(--border)}
+.escrow-box{background:var(--surface);border:1px solid rgba(94,245,176,.15);border-radius:24px;padding:52px;position:relative;overflow:hidden}
+.escrow-box::after{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(94,245,176,.07),transparent 70%);pointer-events:none}
+.escrow-flow{display:flex;align-items:center;margin:44px 0}
+.e-node{flex:1;min-width:120px;text-align:center;padding:20px 12px;background:var(--surface2);border-radius:14px;border:1px solid var(--border)}
+.e-node.hl{border-color:rgba(94,245,176,.3);background:rgba(94,245,176,.05)}
+.e-node .ico{font-size:1.7rem;margin-bottom:6px}
+.e-node strong{display:block;font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;margin-bottom:3px}
+.e-node small{font-size:.72rem;color:var(--muted)}
+.e-arrow{padding:0 10px;color:var(--c-green);font-size:1.2rem;flex-shrink:0}
+.escrow-note{font-size:.875rem;color:var(--muted);line-height:1.75}
+.escrow-note strong{color:var(--text)}
+.client-cta-bottom{padding:80px 0;border-top:1px solid var(--border);text-align:center}
+.client-cta-bottom h2{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:800;margin-bottom:16px;letter-spacing:-.5px}
+.client-cta-bottom p{color:var(--muted);max-width:440px;margin:0 auto 40px;font-size:.95rem}
+.pro-hero{padding:80px 0 60px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.benefit-row{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:16px;transition:all .25s;animation:floatInL .5s ease both}
+@keyframes floatInL{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+.benefit-row:hover{border-color:rgba(157,127,245,.25);transform:translateX(-6px)}
+.b-icon{font-size:1.5rem;width:38px;text-align:center;flex-shrink:0}
+.b-info h5{font-family:'Syne',sans-serif;font-size:.875rem;font-weight:700;margin-bottom:2px}
+.b-info span{font-size:.78rem;color:var(--muted)}
+.nichos-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.nicho-big{border-radius:22px;padding:40px;border:1px solid var(--border);background:var(--surface);position:relative;overflow:hidden;transition:all .3s}
+.nicho-big::before{content:'';position:absolute;inset:0;border-radius:22px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:0}
+.nicho-big.salud::before{background:radial-gradient(ellipse at 0% 0%,rgba(94,245,176,.08),transparent 60%)}
+.nicho-big.tech::before{background:radial-gradient(ellipse at 100% 0%,rgba(157,127,245,.09),transparent 60%)}
+.nicho-big:hover{transform:translateY(-5px)}
+.nicho-big:hover::before{opacity:1}
+.nicho-big.salud:hover{border-color:rgba(94,245,176,.3)}
+.nicho-big.tech:hover{border-color:rgba(157,127,245,.3)}
+.n-icon{font-size:2.5rem;margin-bottom:18px;position:relative;z-index:1}
+.nicho-pill-sm{display:inline-block;border-radius:100px;padding:4px 13px;font-size:.7rem;font-weight:600;margin-bottom:14px;letter-spacing:.05em;text-transform:uppercase;position:relative;z-index:1}
+.salud .nicho-pill-sm{background:rgba(94,245,176,.1);color:var(--c-green)}
+.tech .nicho-pill-sm{background:rgba(157,127,245,.1);color:var(--c-violet)}
+.nicho-big h3{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:10px;position:relative;z-index:1}
+.nicho-big p{color:var(--muted);font-size:.875rem;line-height:1.7;margin-bottom:20px;position:relative;z-index:1}
+.nicho-req-box{background:var(--surface2);border-radius:12px;padding:16px;font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:24px;position:relative;z-index:1}
+.nicho-req-box strong{color:var(--text)}
+.pro-steps-section{padding:80px 0;border-top:1px solid var(--border)}
+.pro-steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.pro-step-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px 24px;transition:all .25s}
+.pro-step-card:hover{border-color:rgba(157,127,245,.2);transform:translateY(-3px)}
+.pro-step-num{font-family:'Syne',sans-serif;font-size:3rem;font-weight:800;color:rgba(157,127,245,.12);line-height:1;margin-bottom:20px}
+.pro-step-card h4{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:8px}
+.pro-step-card p{font-size:.82rem;color:var(--muted);line-height:1.65}
+.comision-section{padding:80px 0;border-top:1px solid var(--border)}
+.comision-box{display:flex;align-items:center;gap:52px;flex-wrap:wrap;background:linear-gradient(135deg,var(--surface),rgba(157,127,245,.04));border:1px solid rgba(157,127,245,.18);border-radius:24px;padding:52px}
+.price-big{font-family:'Syne',sans-serif;font-size:clamp(3rem,7vw,4.8rem);font-weight:800;line-height:1;background:linear-gradient(135deg,var(--c-violet),var(--c-sky));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.comision-detail h3{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;margin-bottom:10px}
+.comision-detail p{color:var(--muted);font-size:.9rem;line-height:1.75;margin-bottom:20px}
+.feature-list{display:flex;flex-direction:column;gap:9px}
+.fl{display:flex;align-items:center;gap:9px;font-size:.85rem;color:var(--muted)}
+.fl::before{content:'\2713';color:var(--c-violet);font-weight:700}
+.btn-reg-salud{width:100%;background:var(--c-green);color:#000;border:none;padding:14px;border-radius:100px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;font-size:.875rem;transition:all .2s;position:relative;z-index:2}
+.btn-reg-salud:hover{opacity:.85;transform:translateY(-1px)}
+.btn-reg-tech{width:100%;background:var(--c-violet);color:#fff;border:none;padding:14px;border-radius:100px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;font-size:.875rem;transition:all .2s;position:relative;z-index:2}
+.btn-reg-tech:hover{opacity:.85;transform:translateY(-1px)}
+.reg-progress{padding:24px 0;border-bottom:1px solid var(--border);background:rgba(8,8,16,.6)}
+.progress-track{max-width:600px;margin:0 auto;padding:0 28px}
+.progress-steps{display:flex;align-items:center}
+.prog-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative}
+.prog-step:not(:last-child)::after{content:'';position:absolute;top:14px;left:50%;width:100%;height:2px;background:var(--border);z-index:0}
+.prog-step.done:not(:last-child)::after,.prog-step.active:not(:last-child)::after{background:var(--c-violet)}
+.prog-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;z-index:1;transition:all .3s;color:var(--muted)}
+.prog-step.done .prog-dot{background:var(--c-violet);border-color:var(--c-violet);color:#fff}
+.prog-step.active .prog-dot{border-color:var(--c-violet);color:var(--c-violet);box-shadow:0 0 0 3px rgba(157,127,245,.2)}
+.prog-label{font-size:.62rem;color:var(--muted);text-align:center;white-space:nowrap;letter-spacing:.04em;text-transform:uppercase}
+.prog-step.active .prog-label,.prog-step.done .prog-label{color:var(--c-violet)}
+.reg-container{max-width:640px;margin:0 auto;padding:52px 28px 80px}
+.reg-step{display:none}
+.reg-step.active{display:block;animation:stepIn .35s ease both}
+@keyframes stepIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.reg-step-header{margin-bottom:36px}
+.reg-step-header h2{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;letter-spacing:-.3px;line-height:1.2;margin-bottom:10px}
+.reg-step-header p{color:var(--muted);font-size:.9rem;line-height:1.7}
+.field-group{margin-bottom:20px}
+.field-group label{display:block;font-size:.8rem;font-weight:500;color:var(--muted);margin-bottom:7px;letter-spacing:.04em;text-transform:uppercase}
+.field-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;transition:border-color .2s;outline:none}
+.field-input:focus{border-color:var(--c-violet)}
+.field-input::placeholder{color:var(--muted)}
+select.field-input{cursor:pointer}
+select.field-input option{background:var(--surface2)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.file-upload-zone{border:2px dashed var(--border);border-radius:16px;padding:36px;text-align:center;cursor:pointer;transition:all .25s;position:relative;background:var(--surface)}
+.file-upload-zone:hover{border-color:var(--c-violet);background:rgba(157,127,245,.04)}
+.file-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.file-upload-icon{font-size:2.4rem;margin-bottom:12px}
+.file-upload-zone h4{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:6px}
+.file-upload-zone p{font-size:.8rem;color:var(--muted)}
+.file-preview{display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid rgba(157,127,245,.25);border-radius:12px;padding:14px 16px;margin-top:12px}
+.file-preview-icon{font-size:1.4rem}
+.file-preview-name{font-size:.85rem;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-preview-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:4px;transition:color .2s}
+.file-preview-remove:hover{color:var(--c-red)}
+.file-status-ok{display:inline-flex;align-items:center;gap:6px;color:var(--c-green);font-size:.8rem;margin-top:8px}
+.upload-formats{font-size:.75rem;color:var(--muted);margin-top:8px;text-align:center}
+.bot-chat{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:20px;min-height:120px;max-height:360px;overflow-y:auto}
+.bot-msg{display:flex;gap:12px;margin-bottom:16px;animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.bot-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--c-violet),var(--c-sky));display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;margin-top:2px}
+.bot-bubble{background:var(--surface2);border-radius:0 14px 14px 14px;padding:12px 16px;font-size:.875rem;line-height:1.65;max-width:calc(100% - 48px)}
+.user-msg{display:flex;gap:12px;margin-bottom:16px;justify-content:flex-end}
+.user-bubble{background:rgba(157,127,245,.15);border:1px solid rgba(157,127,245,.2);border-radius:14px 0 14px 14px;padding:12px 16px;font-size:.875rem;line-height:1.65;max-width:80%}
+.bot-typing{display:flex;gap:12px;margin-bottom:16px}
+.typing-dots{display:flex;align-items:center;gap:5px;padding:14px 16px;background:var(--surface2);border-radius:0 14px 14px 14px}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:tdot 1.2s ease infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,80%,100%{transform:scale(1);opacity:.5}40%{transform:scale(1.3);opacity:1}}
+.bot-input-row{display:flex;gap:10px}
+.bot-text-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:12px 18px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.875rem;outline:none;transition:border-color .2s}
+.bot-text-input:focus{border-color:var(--c-violet)}
+.bot-send-btn{background:var(--c-violet);border:none;border-radius:50%;width:42px;height:42px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;flex-shrink:0}
+.bot-send-btn:hover{opacity:.85;transform:scale(1.05)}
+.bot-verified{display:flex;align-items:center;gap:10px;background:rgba(94,245,176,.07);border:1px solid rgba(94,245,176,.2);border-radius:12px;padding:14px 16px;margin-top:16px}
+.bot-verified span{font-size:.875rem}
+.test-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.test-progress-bar{height:6px;background:var(--surface2);border-radius:100px;margin-bottom:32px;overflow:hidden}
+.test-progress-fill{height:100%;background:linear-gradient(90deg,var(--c-violet),var(--c-sky));border-radius:100px;transition:width .4s ease}
+.test-question-num{font-size:.75rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.test-category-badge{font-size:.7rem;border-radius:100px;padding:3px 12px;background:rgba(157,127,245,.1);color:var(--c-violet)}
+.test-question{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;line-height:1.4;margin-bottom:24px}
+.test-options{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.test-option{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 20px;cursor:pointer;transition:all .2s;font-size:.9rem;text-align:left;color:var(--text);font-family:'DM Sans',sans-serif}
+.test-option:hover:not(:disabled){border-color:rgba(157,127,245,.3);background:rgba(157,127,245,.04);transform:translateX(4px)}
+.test-option.selected{border-color:var(--c-violet);background:rgba(157,127,245,.1);color:var(--c-violet)}
+.test-option.correct{border-color:var(--c-green)!important;background:rgba(94,245,176,.1)!important;color:var(--c-green)!important}
+.test-option.wrong{border-color:var(--c-red)!important;background:rgba(248,113,113,.08)!important;color:var(--c-red)!important}
+.test-option:disabled{cursor:default}
+.test-nav{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.test-skip{background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:3px}
+.test-skip:hover{color:var(--text)}
+.level-result-container{background:var(--surface);border:1px solid var(--border);border-radius:24px;overflow:hidden;margin-top:20px}
+.level-result-header{padding:36px;text-align:center;border-bottom:1px solid var(--border)}
+.level-bars{display:flex;flex-direction:column;gap:10px;padding:24px 28px;background:var(--surface2)}
+.level-bar-row{display:flex;align-items:center;gap:12px;font-size:.8rem}
+.level-bar-label{width:70px;color:var(--muted);flex-shrink:0}
+.level-bar-track{flex:1;height:8px;background:var(--surface);border-radius:100px;overflow:hidden}
+.level-bar-fill{height:100%;border-radius:100px;transition:width 1s ease .3s}
+.level-bar-fill.hw{background:var(--c-violet)}
+.level-bar-fill.sw{background:var(--c-sky)}
+.level-bar-fill.net{background:var(--c-green)}
+.level-bar-val{width:32px;text-align:right;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;flex-shrink:0}
+.level-type-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:20px 28px;border-top:1px solid var(--border)}
+.level-chip{border-radius:100px;padding:6px 16px;font-size:.75rem;font-weight:600}
+.level-chip.green{background:rgba(94,245,176,.1);color:var(--c-green);border:1px solid rgba(94,245,176,.25)}
+.level-chip.violet{background:rgba(157,127,245,.1);color:var(--c-violet);border:1px solid rgba(157,127,245,.25)}
+.level-chip.sky{background:rgba(59,196,245,.1);color:var(--c-sky);border:1px solid rgba(59,196,245,.25)}
+.level-chip.yellow{background:rgba(251,191,36,.1);color:var(--c-yellow);border:1px solid rgba(251,191,36,.25)}
+.reg-actions{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+.btn-next{background:var(--c-violet);color:#fff;border:none;padding:15px 32px;border-radius:100px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;font-size:.95rem;transition:all .2s;flex:1}
+.btn-next:hover:not(:disabled){opacity:.88;transform:translateY(-1px)}
+.btn-next:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-back-step{background:transparent;color:var(--muted);border:1px solid var(--border);padding:15px 24px;border-radius:100px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:400;font-size:.9rem;transition:all .2s}
+.btn-back-step:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.page-footer{border-top:1px solid var(--border);padding:32px 0}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;background:linear-gradient(135deg,var(--c-green),var(--c-violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.page-footer span{color:var(--muted);font-size:.75rem}
+.service-selector-section{padding:80px 0;border-top:1px solid var(--border)}
+.service-cats{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:0}
+.scat-card{border-radius:20px;padding:28px 24px;cursor:pointer;border:2px solid var(--border);background:var(--surface);transition:all .3s;position:relative;overflow:hidden}
+.scat-card::before{content:'';position:absolute;inset:0;border-radius:20px;opacity:0;transition:opacity .3s}
+.scat-card.tech::before{background:radial-gradient(ellipse at 0% 0%,rgba(157,127,245,.1),transparent 65%)}
+.scat-card.salud::before{background:radial-gradient(ellipse at 0% 0%,rgba(94,245,176,.1),transparent 65%)}
+.scat-card:hover::before,.scat-card.selected::before{opacity:1}
+.scat-card.tech:hover,.scat-card.tech.selected{border-color:rgba(157,127,245,.55);box-shadow:0 16px 48px rgba(157,127,245,.12)}
+.scat-card.salud:hover,.scat-card.salud.selected{border-color:rgba(94,245,176,.55);box-shadow:0 16px 48px rgba(94,245,176,.12)}
+.scat-card-emoji{font-size:2.2rem;margin-bottom:12px}
+.scat-card h3{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:6px}
+.scat-card.tech h3{color:var(--c-violet)}.scat-card.salud h3{color:var(--c-green)}
+.scat-card p{font-size:.8rem;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.scat-tag-row{display:flex;gap:6px;flex-wrap:wrap}
+.scat-tag{font-size:.68rem;border-radius:100px;padding:3px 10px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.scat-open-hint{font-size:.75rem;margin-top:14px;display:flex;align-items:center;gap:6px;transition:all .2s}
+.scat-card.tech .scat-open-hint{color:var(--c-violet)}.scat-card.salud .scat-open-hint{color:var(--c-green)}
+.service-panel{display:none;margin-top:20px;animation:stepIn .35s ease both;background:var(--surface);border:1px solid var(--border);border-radius:24px;overflow:hidden}
+.service-panel.open{display:block}
+.service-panel-header{padding:20px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.service-panel-header h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;display:flex;align-items:center;gap:8px}
+.service-panel-close{background:none;border:1px solid var(--border);border-radius:50%;width:30px;height:30px;cursor:pointer;color:var(--muted);font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.service-panel-close:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.service-item{display:flex;align-items:center;gap:16px;padding:16px 28px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s;position:relative}
+.service-item:last-child{border-bottom:none}
+.service-item:hover{background:rgba(255,255,255,.03)}
+.si-icon{font-size:1.5rem;width:38px;text-align:center;flex-shrink:0}
+.si-info{flex:1}.si-info h5{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;margin-bottom:2px}
+.si-info span{font-size:.76rem;color:var(--muted)}
+.si-badge{font-size:.68rem;border-radius:100px;padding:3px 11px;background:rgba(94,245,176,.09);color:var(--c-green);white-space:nowrap;flex-shrink:0;border:1px solid rgba(94,245,176,.2)}
+.si-arrow{color:var(--muted);font-size:.85rem;margin-left:6px;transition:transform .2s}
+.service-item:hover .si-arrow{transform:translateX(3px);color:var(--text)}
+.wa-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.wa-modal-overlay.open{display:flex;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.wa-modal{background:var(--surface);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:36px;max-width:440px;width:100%;animation:stepIn .3s ease both}
+.wa-modal-icon{font-size:3rem;text-align:center;margin-bottom:14px}
+.wa-modal h3{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:800;text-align:center;margin-bottom:8px}
+.wa-modal-desc{color:var(--muted);font-size:.875rem;text-align:center;line-height:1.7;margin-bottom:18px}
+.wa-service-pill{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(94,245,176,.08);border:1px solid rgba(94,245,176,.2);border-radius:100px;padding:8px 18px;font-size:.82rem;color:var(--c-green);margin-bottom:24px;font-weight:500}
+.wa-modal-btns{display:flex;flex-direction:column;gap:10px}
+.wa-modal-btns .btn-green{justify-content:center}
+.wa-btn-cancel{background:none;border:1px solid var(--border);border-radius:100px;padding:13px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;transition:all .2s}
+.wa-btn-cancel:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.send-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(14px);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+.send-overlay.open{display:flex}
+.send-box{background:var(--surface);border:1px solid rgba(157,127,245,.25);border-radius:24px;padding:52px 40px;max-width:400px;width:100%;text-align:center;animation:stepIn .4s ease both}
+.send-spinner-big{width:52px;height:52px;border:4px solid rgba(157,127,245,.12);border-top-color:var(--c-violet);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 24px}
+.send-box h3{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:10px}
+.send-box p{color:var(--muted);font-size:.875rem;line-height:1.7}
+.send-loading{display:block}
+.send-success{display:none}
+.send-success-icon{font-size:3.5rem;margin-bottom:16px}
+.send-success h3{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--c-green);margin-bottom:10px}
+.send-success p{color:var(--muted);font-size:.875rem;line-height:1.7;margin-bottom:28px}
+@media(max-width:860px){.service-cats{grid-template-columns:1fr}}
+.inscr-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(14px);z-index:400;display:none;align-items:center;justify-content:center;padding:20px}
+.inscr-overlay.open{display:flex;animation:fadeIn .2s ease}
+.inscr-modal{background:var(--surface);border:1px solid rgba(255,255,255,.09);border-radius:28px;padding:44px 38px 36px;max-width:480px;width:100%;position:relative;animation:stepIn .3s ease both;text-align:center}
+.inscr-modal-close{position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);border-radius:50%;width:32px;height:32px;cursor:pointer;color:var(--muted);font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.inscr-modal-close:hover{border-color:rgba(255,255,255,.25);color:var(--text)}
+.inscr-modal-icon{font-size:2.6rem;margin-bottom:14px}
+.inscr-modal h2{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:8px;letter-spacing:-.3px}
+.inscr-modal-sub{color:var(--muted);font-size:.84rem;line-height:1.7;margin-bottom:20px}
+.inscr-type-pill{display:inline-flex;align-items:center;gap:7px;border-radius:100px;padding:5px 16px;font-size:.75rem;font-weight:600;margin:0 auto 24px}
+.inscr-type-pill.salud{background:rgba(94,245,176,.1);color:var(--c-green);border:1px solid rgba(94,245,176,.25)}
+.inscr-type-pill.tech{background:rgba(157,127,245,.1);color:var(--c-violet);border:1px solid rgba(157,127,245,.25)}
+.correo-display-box{border-radius:20px;padding:22px 24px;margin-bottom:22px;border:2px solid}
+.correo-display-box.salud{background:rgba(94,245,176,.05);border-color:rgba(94,245,176,.3)}
+.correo-display-box.tech{background:rgba(157,127,245,.05);border-color:rgba(157,127,245,.3)}
+.correo-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px;font-weight:500}
+.correo-address{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;letter-spacing:-.3px;margin-bottom:14px;word-break:break-all}
+.correo-display-box.salud .correo-address{color:var(--c-green)}
+.correo-display-box.tech .correo-address{color:var(--c-violet)}
+.correo-copy-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:100px;padding:8px 20px;font-size:.8rem;font-family:'DM Sans',sans-serif;color:var(--text);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.correo-copy-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+.correo-instrucciones{text-align:left;display:flex;flex-direction:column;gap:10px;margin-bottom:24px;background:var(--surface2);border-radius:16px;padding:18px 20px}
+.ci-row{display:flex;align-items:flex-start;gap:12px;font-size:.82rem;color:var(--muted);line-height:1.5}
+.ci-num{min-width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--text);flex-shrink:0;margin-top:1px}
+.ci-row strong{color:var(--text)}
+.inscr-gmail-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;border-radius:100px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.95rem;text-decoration:none;transition:all .2s;margin-bottom:10px}
+.inscr-gmail-btn.salud{background:var(--c-green);color:#000}
+.inscr-gmail-btn.tech{background:var(--c-violet);color:#fff}
+.inscr-gmail-btn:hover:not([data-disabled="true"]){opacity:.88;transform:translateY(-1px)}
+.inscr-gmail-btn[data-disabled="true"]{opacity:.35;cursor:not-allowed;pointer-events:none;filter:grayscale(.4)}
+.inscr-test-aviso{display:none;background:rgba(157,127,245,.08);border:1px solid rgba(157,127,245,.2);border-radius:12px;padding:12px 16px;font-size:.78rem;color:var(--muted);line-height:1.6;margin-bottom:12px;text-align:center}
+.inscr-test-aviso.visible{display:block}
+.inscr-test-ok{display:none;background:rgba(94,245,176,.07);border:1px solid rgba(94,245,176,.2);border-radius:12px;padding:10px 16px;font-size:.78rem;color:var(--c-green);margin-bottom:12px;text-align:center}
+.inscr-test-ok.visible{display:block}
+.inscr-modal-cancel{background:none;border:1px solid var(--border);border-radius:100px;padding:11px 24px;width:100%;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--muted);cursor:pointer;transition:all .2s}
+.inscr-modal-cancel:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+@media(max-width:860px){
+  .client-hero,.pro-hero{grid-template-columns:1fr;gap:40px}
+  .steps-grid,.pro-steps-grid{grid-template-columns:1fr 1fr}
+  .nichos-grid{grid-template-columns:1fr}
+  .choice-grid{grid-template-columns:1fr;max-width:420px}
+  .profile-card-body{grid-template-columns:1fr}
+  .field-row{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .wrap{padding:0 16px}
+  .client-hero,.pro-hero{padding:52px 0 40px}
+  .steps-grid,.pro-steps-grid{grid-template-columns:1fr}
+  .escrow-flow{flex-direction:column;gap:8px}
+  .e-arrow{transform:rotate(90deg)}
+  .comision-box{flex-direction:column;padding:28px 20px;gap:28px}
+  .escrow-box{padding:28px 20px}
+  .home-hero{padding:60px 0 40px}
+  .reg-container{padding:36px 16px 60px}
+  .profile-card-header{flex-direction:column;align-items:flex-start}
+  .prog-label{display:none}
+}
+</style>
+</head>
+<body>
+<div class="home-blobs"><div class="blob"></div><div class="blob"></div></div>
+<div class="client-blobs" style="display:none"><div class="blob"></div><div class="blob"></div></div>
+<div class="pro-blobs" style="display:none"><div class="blob"></div><div class="blob"></div></div>
+<div class="reg-blobs" style="display:none"><div class="blob"></div><div class="blob"></div></div>
+
+<!-- ================= PAGE HOME ================= -->
+<div class="page active" id="page-home">
+  <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo">Nexo</div><div style="display:flex;align-items:center;gap:12px"><span style="color:var(--muted);font-size:.78rem">Llegando pronto &middot; Chile 2026</span><button class="theme-btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar tema"><span id="theme-icon">☀️</span> <span id="theme-label">Claro</span></button></div></div></nav>
+  <main><div class="wrap"><div class="home-hero">
+    <div class="home-badge"><div class="dot"></div>Plataforma en lanzamiento &nbsp;&middot;&nbsp;<span>Chile 2026</span></div>
+    <h1>Encuentra al experto.<br><span class="word-nexo">Nexo</span> te conecta.</h1>
+    <p class="home-sub">Técnicos e informáticos verificados, kinesiólogos titulados &mdash; con pago 100% seguro hasta que quedes conforme.</p>
+    <div class="home-search-wrap fu">
+      <div class="home-search-inner"><span class="home-search-icon">🔍</span><input class="home-search-input" id="home-search" type="text" placeholder="¿Qué necesitas? Ej: reparación de PC, kinesiología..."><button class="home-search-btn" onclick="handleHomeSearch()">Buscar</button></div>
+    </div>
+    <div class="search-filters fu" id="search-filters">
+      <button class="sf-pill active" data-cat="todos" onclick="setSearchFilter(this,'todos')">Todos</button>
+      <button class="sf-pill" data-cat="tech" onclick="setSearchFilter(this,'tech')">💻 Técnico &amp; TI</button>
+      <button class="sf-pill" data-cat="salud" onclick="setSearchFilter(this,'salud')">🩺 Kinesiólogo</button>
+      <button class="sf-pill" data-cat="redes" onclick="setSearchFilter(this,'redes')">🌐 Redes</button>
+      <button class="sf-pill" data-cat="datos" onclick="setSearchFilter(this,'datos')">💾 Recuperación datos</button>
+      <button class="sf-pill" data-cat="domicilio" onclick="setSearchFilter(this,'domicilio')">🏠 A domicilio</button>
+    </div>
+    <div class="choice-grid">
+      <div class="choice-card client-card" onclick="goTo('page-clientes')"><span class="card-emoji">🙋</span><h2>Necesito<br>un servicio</h2><p>Un kinesiólogo a domicilio, un técnico que resucite tu PC, o alguien que configure tu red sin que te compliques.</p><button class="card-cta">Contratar ahora <span class="card-cta-arrow">&rarr;</span></button></div>
+      <div class="choice-card pro-card" onclick="goTo('page-pro')"><span class="card-emoji">💼</span><h2>Soy<br>profesional</h2><p>Tienes el talento, nosotros te traemos los clientes. Pago garantizado antes de que empieces a trabajar.</p><button class="card-cta">Quiero inscribirme <span class="card-cta-arrow">&rarr;</span></button></div>
+    </div>
+    <div class="home-footer-note"><span>🔒 Pago en garantía (escrow)</span><span>💰 Solo $2.000 de comisión</span><span>✅ Profesionales verificados</span></div>
+  </div></div></main>
+  <div id="home-extra-sections" style="position:relative;z-index:1"><div class="wrap">
+    <div class="pro-banner fu"><div class="pro-banner-text"><h3>¿Eres técnico o kinesiólogo?<br>Consigue clientes sin publicidad.</h3><p>Te conectamos con personas que ya buscan lo que tú ofreces. Pago asegurado, comisión fija, sin mensualidades.</p><div class="mini-checks"><span class="mini-check">Perfil verificado</span><span class="mini-check">Solo $2.000 por servicio</span><span class="mini-check">Sin suscripción</span><span class="mini-check">Activo en 24–48 hrs</span></div></div><div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0"><button class="btn-violet" onclick="goTo('page-pro')">Inscribirme como profesional &rarr;</button><button class="btn-ghost" onclick="goTo('page-pro')" style="font-size:.82rem;padding:11px 24px">Ver cómo funciona</button></div></div>
+    <div class="dest-section fu"><div class="dest-header"><h2>✨ Profesionales destacados</h2><span>Mejor calificados esta semana</span></div><div class="dest-grid">
+      <div class="dest-card green"><div class="dest-avatar-wrap"><div class="dest-avatar green">🌸</div><span class="dest-badge green">Top Salud</span></div><div><div class="dest-name">Tsunade Senju</div><div class="dest-role">Kinesióloga · Especialidad traumatológica</div></div><div class="dest-stars">★★★★★ <span style="color:var(--muted);font-weight:400">5.0</span></div><div class="dest-tag-row"><span class="dest-tag">A domicilio</span><span class="dest-tag">Rehabilitación</span><span class="dest-tag">Deportiva</span></div><div class="dest-stats"><span class="dest-stat"><strong>142</strong> servicios</span><span class="dest-stat"><strong>RM</strong> Región</span></div></div>
+      <div class="dest-card violet"><div class="dest-avatar-wrap"><div class="dest-avatar violet">⚗️</div><span class="dest-badge violet">Senior TI</span></div><div><div class="dest-name">Senku Ishigami</div><div class="dest-role">Técnico TI · Redes &amp; Hardware</div></div><div class="dest-stars">★★★★★ <span style="color:var(--muted);font-weight:400">4.9</span></div><div class="dest-tag-row"><span class="dest-tag">Redes</span><span class="dest-tag">Diagnóstico</span><span class="dest-tag">Online/Domicilio</span></div><div class="dest-stats"><span class="dest-stat"><strong>218</strong> servicios</span><span class="dest-stat"><strong>RM</strong> Región</span></div></div>
+      <div class="dest-card sky"><div class="dest-avatar-wrap"><div class="dest-avatar sky">💎</div><span class="dest-badge sky">Top Biobío</span></div><div><div class="dest-name">Rem</div><div class="dest-role">Kinesióloga · Neurológica &amp; Pediátrica</div></div><div class="dest-stars">★★★★★ <span style="color:var(--muted);font-weight:400">5.0</span></div><div class="dest-tag-row"><span class="dest-tag">Neurológica</span><span class="dest-tag">Pediátrica</span><span class="dest-tag">Domicilio</span></div><div class="dest-stats"><span class="dest-stat"><strong>97</strong> servicios</span><span class="dest-stat"><strong>Biobío</strong> Región</span></div></div>
+      <div class="dest-card violet"><div class="dest-avatar-wrap"><div class="dest-avatar violet">🍰</div><span class="dest-badge violet">Senior TI</span></div><div><div class="dest-name">L Lawliet</div><div class="dest-role">Técnico TI · Seguridad &amp; Recuperación datos</div></div><div class="dest-stars">★★★★★ <span style="color:var(--muted);font-weight:400">4.8</span></div><div class="dest-tag-row"><span class="dest-tag">Seguridad</span><span class="dest-tag">Datos</span><span class="dest-tag">Software</span></div><div class="dest-stats"><span class="dest-stat"><strong>176</strong> servicios</span><span class="dest-stat"><strong>RM</strong> Región</span></div></div>
+      <div class="dest-card green"><div class="dest-avatar-wrap"><div class="dest-avatar green">🩹</div><span class="dest-badge green">Top Salud</span></div><div><div class="dest-name">Recovery Girl</div><div class="dest-role">Kinesióloga · Geriátrica &amp; Respiratoria</div></div><div class="dest-stars">★★★★★ <span style="color:var(--muted);font-weight:400">4.9</span></div><div class="dest-tag-row"><span class="dest-tag">Geriátrica</span><span class="dest-tag">Respiratoria</span><span class="dest-tag">Domicilio</span></div><div class="dest-stats"><span class="dest-stat"><strong>203</strong> servicios</span><span class="dest-stat"><strong>Valparaíso</strong> Región</span></div></div>
+      <div class="dest-card sky"><div class="dest-avatar-wrap"><div class="dest-avatar sky">⚔️</div><span class="dest-badge sky">Mid TI</span></div><div><div class="dest-name">Levi Ackerman</div><div class="dest-role">Técnico TI · Reparación &amp; Soporte</div></div><div class="dest-stars">★★★★☆ <span style="color:var(--muted);font-weight:400">4.7</span></div><div class="dest-tag-row"><span class="dest-tag">Hardware</span><span class="dest-tag">Soporte</span><span class="dest-tag">Domicilio</span></div><div class="dest-stats"><span class="dest-stat"><strong>88</strong> servicios</span><span class="dest-stat"><strong>Biobío</strong> Región</span></div></div>
+    </div></div>
+    <div class="cats-section fu"><div class="cats-intro"><p class="slabel g">¿En qué área necesitas ayuda?</p><h2 class="sh">Servicios disponibles en Nexo.</h2><p class="ssub">Desde tu PC hasta tu rehabilitación. Todo bajo el mismo techo y con el mismo pago seguro.</p></div><div class="cats-grid">
+      <div class="cat-block" style="--cat-clr:var(--c-violet)" onclick="goTo('page-clientes')"><div class="cat-block-ico">💻</div><h4>Soporte técnico</h4><p>PCs lentas, pantallas negras, software que no arranca. Lo arreglamos.</p><span class="cat-block-count">7 servicios</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-sky)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🌐</div><h4>Redes &amp; WiFi</h4><p>Instalación, configuración y extensión de cobertura. Sin puntos ciegos.</p><span class="cat-block-count">3 servicios</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-green)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🩺</div><h4>Kinesiología</h4><p>Titulados inscritos en Superintendencia de Salud. A tu domicilio.</p><span class="cat-block-count">7 especialidades</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-pink)" onclick="goTo('page-clientes')"><div class="cat-block-ico">💾</div><h4>Recuperación de datos</h4><p>Discos duros, pendrives, particiones corruptas. Rescatamos lo que necesitas.</p><span class="cat-block-count">Especialidad</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-yellow)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🛡️</div><h4>Seguridad &amp; virus</h4><p>Limpieza de malware, firewall, protección real. No solo antivirus.</p><span class="cat-block-count">2 servicios</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-sky)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🖥️</div><h4>Soporte remoto</h4><p>Sin que nadie tenga que moverse. Conexión, diagnóstico y solución al tiro.</p><span class="cat-block-count">Disponible</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-green)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🦴</div><h4>Rehabilitación</h4><p>Post-operatoria, traumática, deportiva. Te acompañamos hasta recuperarte.</p><span class="cat-block-count">4 especialidades</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-violet)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🫁</div><h4>Salud respiratoria</h4><p>EPOC, asma, post-COVID. Kinesiólogos especializados en rehabilitación pulmonar.</p><span class="cat-block-count">Especialidad</span></div>
+    </div></div>
+    <div class="how-section fu"><div class="how-intro"><p class="slabel g">El proceso</p><h2 class="sh">Cuatro pasos. Sin letra chica.</h2><p class="ssub">Diseñado para que ni el cliente ni el profesional quede expuesto. El dinero siempre tiene dueño claro.</p></div><div class="how-steps">
+      <div class="how-step"><div class="how-step-dot">💬</div><h4>Solicitas</h4><p>Escríbenos por WhatsApp con lo que necesitas. Sin formularios eternos.</p></div>
+      <div class="how-step"><div class="how-step-dot">🔒</div><h4>Pagas a Nexo</h4><p>Tu dinero queda retenido. No va al profesional todavía. Nadie pierde.</p></div>
+      <div class="how-step"><div class="how-step-dot">🤝</div><h4>Recibes el servicio</h4><p>El profesional trabaja sabiendo que el pago está asegurado.</p></div>
+      <div class="how-step"><div class="how-step-dot">✅</div><h4>Confirmas</h4><p>¿Todo bien? Liberas el pago. Si no, recuperas tu dinero íntegro.</p></div>
+    </div></div>
+  </div></div>
+</div>
+
+<!-- ================= PAGE CLIENTES ================= -->
+<div class="page" id="page-clientes">
+  <div class="client-blobs"><div class="blob"></div><div class="blob"></div></div>
+  <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo" onclick="goTo('page-home')" style="cursor:pointer">Nexo</div><div style="display:flex;gap:8px;align-items:center"><button class="theme-btn" onclick="toggleTheme()" aria-label="Cambiar tema">🌓</button><button class="nav-back" onclick="goTo('page-home')"><span>&larr;</span> Volver al inicio</button></div></div></nav>
+  <main><div class="wrap">
+    <div class="client-hero">
+      <div class="client-hero-text fu"><div class="eyebrow-g">👤 Para clientes</div><h1>Encuentra al profesional que necesitas, <span style="color:var(--c-green)">hoy.</span></h1><p>Conéctate con kinesiólogos titulados y técnicos verificados. Tu pago queda retenido hasta que el trabajo quede perfecto.</p></div>
+      <div class="client-hero-visual fu"><div class="mini-service-card" style="animation-delay:.1s"><div class="ms-icon">💻</div><div class="ms-info"><h5>Reparación de PC</h5><span>Técnico a domicilio u online</span></div><span class="ms-badge">Disponible</span></div><div class="mini-service-card" style="animation-delay:.2s"><div class="ms-icon">🩻</div><div class="ms-info"><h5>Kinesiología</h5><span>A domicilio · Titulados inscritos</span></div><span class="ms-badge">Disponible</span></div><div class="mini-service-card" style="animation-delay:.3s"><div class="ms-icon">💾</div><div class="ms-info"><h5>Recuperación de datos</h5><span>Discos, pendrives, particiones</span></div><span class="ms-badge">Disponible</span></div><div class="mini-service-card" style="animation-delay:.4s"><div class="ms-icon">🌐</div><div class="ms-info"><h5>Redes y WiFi</h5><span>Instalación y configuración</span></div><span class="ms-badge">Disponible</span></div><div class="mini-service-card" style="animation-delay:.5s"><div class="ms-icon">🩺</div><div class="ms-info"><h5>Salud a domicilio</h5><span>Evaluaciones y terapias</span></div><span class="ms-badge">Disponible</span></div></div>
+    </div>
+    <div class="service-selector-section" id="service-selector"><p class="slabel g fu">¿Qué necesitas?</p><h2 class="sh fu">Elige la categoría de servicio.</h2><p class="ssub fu">Selecciona el área y verás todos los servicios disponibles para solicitar.</p>
+      <div class="service-cats fu">
+        <div class="scat-card tech" onclick="toggleServicePanel('tech')"><div class="scat-card-emoji">💻</div><h3>Servicio Técnico &amp; Informática</h3><p>Técnicos verificados para reparación, soporte, redes y más.</p><div class="scat-tag-row"><span class="scat-tag">Hardware</span><span class="scat-tag">Software</span><span class="scat-tag">Redes</span><span class="scat-tag">Datos</span></div><div class="scat-open-hint" id="hint-tech">Ver servicios disponibles →</div></div>
+        <div class="scat-card salud" onclick="toggleServicePanel('salud')"><div class="scat-card-emoji">🩺</div><h3>Kinesiología &amp; Salud</h3><p>Kinesiólogos titulados e inscritos en la Superintendencia de Salud.</p><div class="scat-tag-row"><span class="scat-tag">Domicilio</span><span class="scat-tag">Rehabilitación</span><span class="scat-tag">Deportiva</span><span class="scat-tag">Neurológica</span></div><div class="scat-open-hint" id="hint-salud">Ver servicios disponibles →</div></div>
+      </div>
+      <div class="service-panel" id="panel-tech"><div class="service-panel-header"><h3>💻 Servicios de Informática &amp; TI</h3><button class="service-panel-close" onclick="closePanel('tech')">✕</button></div><div class="service-item" onclick="openWaModal('Reparación de PC / Laptop','💻','Pantalla, teclado, placa madre, diagnóstico completo')"><span class="si-icon">💻</span><div class="si-info"><h5>Reparación de PC / Laptop</h5><span>Pantalla, teclado, placa madre, diagnóstico completo</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div><div class="service-item" onclick="openWaModal('Instalación y configuración de Software','📦','SO, drivers, programas, antivirus, optimización')"><span class="si-icon">📦</span><div class="si-info"><h5>Instalación y configuración de Software</h5><span>SO, drivers, programas, antivirus, optimización</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div><div class="service-item" onclick="openWaModal('Recuperación de datos','💾','Discos duros, pendrives, particiones corruptas')"><span class="si-icon">💾</span><div class="si-info"><h5>Recuperación de datos</h5><span>Discos duros, pendrives, particiones corruptas</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div><div class="service-item" onclick="openWaModal('Redes y WiFi','🌐','Instalación, configuración, extensión de cobertura')"><span class="si-icon">🌐</span><div class="si-info"><h5>Redes y WiFi</h5><span>Instalación, configuración, extensión de cobertura</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div><div class="service-item" onclick="openWaModal('Formateo y limpieza de PC','🧹','Formateo completo, reinstalación del sistema, limpieza física')"><span class="si-icon">🧹</span><div class="si-info"><h5>Formateo y limpieza de PC</h5><span>Formateo completo, reinstalación del sistema, limpieza física</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div><div class="service-item" onclick="openWaModal('Seguridad y eliminación de virus','🛡️','Limpieza de malware, spyware, configuración de firewall')"><span class="si-icon">🛡️</span><div class="si-info"><h5>Seguridad y eliminación de virus</h5><span>Limpieza de malware, spyware, configuración de firewall</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div><div class="service-item" onclick="openWaModal('Soporte remoto','🖥️','Asistencia online sin salir de casa, solución rápida')"><span class="si-icon">🖥️</span><div class="si-info"><h5>Soporte remoto</h5><span>Asistencia online sin salir de casa, solución rápida</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div></div>
+      <div class="service-panel" id="panel-salud"><div class="service-panel-header"><h3>🩺 Servicios de Kinesiología &amp; Salud</h3><button class="service-panel-close" onclick="closePanel('salud')">✕</button></div><div class="service-item" onclick="openWaModal('Kinesiología general a domicilio','🩺','Evaluación, ejercicios terapéuticos y seguimiento')"><span class="si-icon">🩺</span><div class="si-info"><h5>Kinesiología general a domicilio</h5><span>Evaluación, ejercicios terapéuticos y seguimiento</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div><div class="service-item" onclick="openWaModal('Rehabilitación traumática','🦴','Recuperación post-operatoria, fracturas, esguinces')"><span class="si-icon">🦴</span><div class="si-info"><h5>Rehabilitación traumática</h5><span>Recuperación post-operatoria, fracturas, esguinces</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div><div class="service-item" onclick="openWaModal('Kinesiología deportiva','⚽','Preparación física, prevención y recuperación de lesiones deportivas')"><span class="si-icon">⚽</span><div class="si-info"><h5>Kinesiología deportiva</h5><span>Preparación física, prevención y recuperación deportiva</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div><div class="service-item" onclick="openWaModal('Rehabilitación neurológica','🧠','Accidente cerebrovascular, Parkinson, esclerosis múltiple')"><span class="si-icon">🧠</span><div class="si-info"><h5>Rehabilitación neurológica</h5><span>ACV, Parkinson, esclerosis múltiple</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div><div class="service-item" onclick="openWaModal('Kinesiología respiratoria','🫁','Fisioterapia respiratoria, EPOC, asma, post-COVID')"><span class="si-icon">🫁</span><div class="si-info"><h5>Kinesiología respiratoria</h5><span>EPOC, asma, recuperación post-COVID</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div><div class="service-item" onclick="openWaModal('Kinesioterapia pediátrica','👶','Atención kinesiología para niños y bebés')"><span class="si-icon">👶</span><div class="si-info"><h5>Kinesioterapia pediátrica</h5><span>Atención especializada para niños y bebés</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div><div class="service-item" onclick="openWaModal('Kinesiología geriátrica','🧓','Adulto mayor, movilidad, equilibrio y calidad de vida')"><span class="si-icon">🧓</span><div class="si-info"><h5>Kinesiología geriátrica</h5><span>Adulto mayor, movilidad, equilibrio y calidad de vida</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div></div>
+    </div>
+    <div style="padding:80px 0;border-top:1px solid var(--border)"><p class="slabel g fu">Cómo funciona</p><h2 class="sh fu">En 4 pasos simples.</h2><p class="ssub fu">Sin complicaciones, sin riesgos.</p><div class="steps-grid"><div class="step-card fu"><div class="step-num-big">01</div><h4>Solicita el servicio</h4><p>Escíbenos por WhatsApp con el detalle de lo que necesitas.</p></div><div class="step-card fu"><div class="step-num-big">02</div><h4>Paga a Nexo (escrow)</h4><p>Tu dinero queda retenido. El profesional sabe que el pago está asegurado.</p></div><div class="step-card fu"><div class="step-num-big">03</div><h4>Recibe el servicio</h4><p>El profesional realiza el trabajo acordado.</p></div><div class="step-card fu"><div class="step-num-big">04</div><h4>Confirma y libera</h4><p>Todo perfecto? Confirmas y liberamos el pago. Si hay problema, recuperas tu dinero.</p></div></div></div>
+    <div class="escrow-section"><p class="slabel g fu">Tu dinero, protegido</p><h2 class="sh fu">Sistema de pago en garantía.</h2><p class="ssub fu">Nadie pierde. Solo liberas el dinero cuando el trabajo quedó como acordaste.</p><div class="escrow-box fu"><div class="escrow-flow"><div class="e-node"><div class="ico">👤</div><strong>Cliente</strong><small>Paga 100%</small></div><div class="e-arrow">→</div><div class="e-node hl"><div class="ico">🔒</div><strong>Nexo (Escrow)</strong><small>Retiene fondos</small></div><div class="e-arrow">→</div><div class="e-node"><div class="ico">✅</div><strong>Confirmación</strong><small>Trabajo validado</small></div><div class="e-arrow">→</div><div class="e-node"><div class="ico">🎯</div><strong>Profesional</strong><small>Recibe el pago</small></div></div><p class="escrow-note">Si el trabajo no se realiza, <strong>recuperas tu dinero íntegro</strong>. Si todo está correcto, el profesional recibe su pago completo al momento de confirmar el trabajo realizado.</p></div></div>
+    <div class="client-cta-bottom"><h2 class="fu">¿Listo para solicitar?</h2><p class="fu">Escríbenos ahora y te conectamos con un profesional verificado.</p><a href="https://wa.me/56900000000?text=Hola,%20necesito%20un%20servicio" class="btn-green fu" target="_blank">Solicitar por WhatsApp →</a></div>
+  </div></main>
+  <footer class="page-footer"><div class="wrap footer-inner"><div class="footer-logo">Nexo</div><span>¿Eres profesional? <b style="cursor:pointer;color:var(--c-violet)" onclick="goTo('page-pro')">Inscríbete aquí →</b></span><span>Chile · 2026</span></div></footer>
+</div>
+
+<!-- ================= PAGE PROFESIONALES ================= -->
+<div class="page" id="page-pro">
+  <div class="pro-blobs"><div class="blob"></div><div class="blob"></div></div>
+  <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo" onclick="goTo('page-home')" style="cursor:pointer">Nexo</div><div style="display:flex;gap:8px;align-items:center"><button class="theme-btn" onclick="toggleTheme()" aria-label="Cambiar tema">🌓</button><button class="nav-back" onclick="goTo('page-home')"><span>&larr;</span> Volver al inicio</button></div></div></nav>
+  <main><div class="wrap">
+    <div class="pro-hero"><div class="pro-hero-text fu"><div class="eyebrow-v">💼 Para profesionales</div><h1>Recibe clientes.<br>Cobra <span style="color:var(--c-violet)">seguro.</span><br>Sin burocracia.</h1><p>Inscríbete en Nexo, recibe solicitudes verificadas y cobra sin preocuparte de que te queden a deber.</p><a href="#nichos-section" class="btn-violet" onclick="document.getElementById('nichos-section').scrollIntoView({behavior:'smooth'});return false;">Ver cómo inscribirme →</a></div><div class="pro-benefits fu"><div class="benefit-row" style="animation-delay:.1s"><div class="b-icon">📲</div><div class="b-info"><h5>Solicitudes directas</h5><span>Te avisamos cuando hay un cliente para ti</span></div></div><div class="benefit-row" style="animation-delay:.2s"><div class="b-icon">🔒</div><div class="b-info"><h5>Pago garantizado</h5><span>El dinero está retenido antes de que empieces</span></div></div><div class="benefit-row" style="animation-delay:.3s"><div class="b-icon">💰</div><div class="b-info"><h5>Solo $2.000 de comisión</h5><span>Monto fijo, sin porcentajes ni sorpresas</span></div></div><div class="benefit-row" style="animation-delay:.4s"><div class="b-icon">✅</div><div class="b-info"><h5>Perfil verificado</h5><span>Más confianza, más clientes</span></div></div></div></div>
+    <div style="padding:80px 0;border-top:1px solid var(--border)" id="nichos-section"><p class="slabel v fu">Elige tu categoría</p><h2 class="sh fu">¿En qué área trabajas?</h2><p class="ssub fu">Selecciona tu especialidad para comenzar el proceso de verificación e inscripción.</p><div class="nichos-grid"><div class="nicho-big salud fu"><div class="n-icon">🩺</div><div class="nicho-pill-sm">Salud</div><h3>Kinesiología &amp; Salud</h3><p>Para kinesiólogos egresados y titulados que quieren captar pacientes con pago garantizado.</p><div class="nicho-req-box"><strong>Requisito legal:</strong> Debes estar titulado e inscrito en el Registro Nacional de Prestadores de la Superintendencia de Salud.<br><br><strong>Perfil ideal:</strong> Egresados recientes y profesionales activos.</div><button class="btn-reg-salud" onclick="abrirModalCorreo('salud')">Inscribirme como profesional de salud →</button></div><div class="nicho-big tech fu"><div class="n-icon">💻</div><div class="nicho-pill-sm">Informática</div><h3>Servicio Técnico &amp; TI</h3><p>Para técnicos y estudiantes de informática que ofrecen soporte, mantención o desarrollo freelance.</p><div class="nicho-req-box"><strong>Sin restricción legal:</strong> Puedes ejercer desde cualquier año de carrera.<br><br><strong>Perfil ideal:</strong> Estudiantes de cualquier nivel, egresados y titulados.</div><button class="btn-reg-tech" onclick="abrirModalCorreo('tech')">Inscribirme como técnico en informática →</button></div></div></div>
+    <div class="pro-steps-section"><p class="slabel v fu">Cómo funciona</p><h2 class="sh fu">Tu flujo como profesional.</h2><p class="ssub fu">Simple, seguro y sin trámites complicados.</p><div class="pro-steps-grid"><div class="pro-step-card fu"><div class="pro-step-num">01</div><h4>Verifica tu identidad</h4><p>Sube tu CV o documento que acredite tu formación.</p></div><div class="pro-step-card fu"><div class="pro-step-num">02</div><h4>Bot de validación</h4><p>Un chat rápido confirma que eres del rubro.</p></div><div class="pro-step-card fu"><div class="pro-step-num">03</div><h4>Test de nivel (TI)</h4><p>15 preguntas de hardware y software para clasificarte Junior, Mid o Senior.</p></div><div class="pro-step-card fu"><div class="pro-step-num">04</div><h4>Recibe clientes</h4><p>Con perfil activo, empiezas a recibir solicitudes verificadas.</p></div></div></div>
+    <div class="comision-section"><p class="slabel v fu">Modelo de cobro</p><h2 class="sh fu">Una comisión fija. Sin sorpresas.</h2><p class="ssub fu">No cobramos mensualidad ni porcentaje. Solo $2.000 por cada servicio concretado.</p><div class="comision-box fu"><div><div class="price-big">$2.000</div><div style="color:var(--muted);font-size:.8rem;margin-top:8px">CLP por servicio concretado</div></div><div class="comision-detail"><h3>Solo si se concreta</h3><p>Si el cliente cancela o no hay match, no se descuenta nada.</p><div class="feature-list"><div class="fl">Sin suscripción mensual</div><div class="fl">Sin porcentaje variable</div><div class="fl">Solo al confirmar trabajo exitoso</div><div class="fl">Descuento automático desde el escrow</div></div></div></div></div>
+  </div></main>
+  <footer class="page-footer"><div class="wrap footer-inner"><div class="footer-logo">Nexo</div><span>¿Buscas un servicio? <b style="cursor:pointer;color:var(--c-green)" onclick="goTo('page-clientes')">Ve a la sección de clientes →</b></span><span>Chile · 2026</span></div></footer>
+</div>
+
+<!-- ================= PAGE REGISTRO MEJORADA ================= -->
+<div class="page" id="page-registro">
+  <div class="reg-blobs"><div class="blob"></div><div class="blob"></div></div>
+  <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo" onclick="goTo('page-home')" style="cursor:pointer">Nexo</div><div style="display:flex;gap:8px;align-items:center"><button class="theme-btn" onclick="toggleTheme()" aria-label="Cambiar tema">🌓</button><button class="nav-back" onclick="goTo('page-pro')"><span>&larr;</span> Volver</button></div></div></nav>
+  <div class="reg-progress"><div class="progress-track"><div class="progress-steps" id="progressSteps"><div class="prog-step active" data-step="1"><div class="prog-dot">1</div><div class="prog-label">Datos</div></div><div class="prog-step" data-step="2"><div class="prog-dot">2</div><div class="prog-label">Documentos</div></div><div class="prog-step" data-step="3"><div class="prog-dot">3</div><div class="prog-label">Verificación</div></div><div class="prog-step tech-only" data-step="4" style="display:none"><div class="prog-dot">4</div><div class="prog-label">Test nivel</div></div><div class="prog-step" data-step="5"><div class="prog-dot">5</div><div class="prog-label">Perfil</div></div></div></div></div>
+  <div class="reg-container">
+    <!-- STEP 1 -->
+    <div class="reg-step active" id="reg-step-1"><div class="reg-step-header"><h2>Tus datos personales</h2><p>Cuéntanos un poco sobre ti para crear tu perfil en Nexo.</p></div><div class="field-row"><div class="field-group"><label>Nombre</label><input class="field-input" id="f-nombre" type="text" placeholder="Tu nombre"></div><div class="field-group"><label>Apellido</label><input class="field-input" id="f-apellido" type="text" placeholder="Tu apellido"></div></div><div class="field-group"><label>Correo electrónico</label><input class="field-input" id="f-email" type="email" placeholder="correo@ejemplo.cl"></div><div class="field-row"><div class="field-group"><label>Teléfono</label><input class="field-input" id="f-telefono" type="tel" placeholder="+56 9 XXXX XXXX"></div><div class="field-group"><label>Región</label><select class="field-input" id="f-region"><option value="">Selecciona tu región</option><option>Región Metropolitana</option><option>Valparaíso</option><option>Biobío</option><option>La Araucanía</option><option>Los Lagos</option><option>Coquimbo</option><option>O'Higgins</option><option>Maule</option><option>Antofagasta</option><option>Atacama</option><option>Tarapacá</option><option>Arica y Parinacota</option><option>Los Ríos</option><option>Aysén</option><option>Magallanes</option><option>Ñuble</option></select></div></div><div class="field-group" id="campo-especialidad-salud" style="display:none"><label>Especialidad</label><select class="field-input" id="f-especialidad"><option value="">Selecciona tu especialidad</option><option>Kinesiología general</option><option>Traumatología y ortopedia</option><option>Neurológica</option><option>Cardiorrespiratoria</option><option>Deportiva</option><option>Pediátrica</option><option>Geriátrica</option></select></div><div class="field-group" id="campo-especialidad-tech" style="display:none"><label>Área principal</label><select class="field-input" id="f-area-tech"><option value="">Selecciona tu área</option><option>Soporte técnico general</option><option>Reparación de hardware</option><option>Redes y conectividad</option><option>Desarrollo de software</option><option>Seguridad informática</option><option>Recuperación de datos</option><option>Sistemas operativos</option></select></div><div class="reg-actions"><button class="btn-next" onclick="nextStep(2)">Continuar →</button></div></div>
+
+    <!-- STEP 2 -->
+    <div class="reg-step" id="reg-step-2"><div class="reg-step-header"><h2>Sube tus documentos</h2><p>Adjunta tus archivos para verificación.</p></div><div id="docs-salud" style="display:none"><div class="field-group"><label>CV o Currículum Vitae</label><div class="file-upload-zone"><input type="file" accept=".pdf,.doc,.docx" onchange="handleFile(this,'cv-salud')"><div class="file-upload-icon">📄</div><h4>Arrastra tu CV aquí</h4><p>o haz clic para seleccionar</p></div><div class="upload-formats">PDF, DOC, DOCX · Máx. 5MB</div><div id="preview-cv-salud"></div></div><div class="field-group"><label>Título universitario o certificado de egreso</label><div class="file-upload-zone"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile(this,'titulo-salud')"><div class="file-upload-icon">🎓</div><h4>Sube tu título o certificado</h4><p>Foto o escaneado del documento oficial</p></div><div class="upload-formats">PDF, JPG, PNG · Máx. 8MB</div><div id="preview-titulo-salud"></div></div><div class="field-group"><label>Número de registro Superintendencia de Salud</label><input class="field-input" id="f-reg-super" type="text" placeholder="Ej: 12345-K"><div style="font-size:.75rem;color:var(--muted);margin-top:6px">Encuéntralo en <a href="https://rnpi.superdesalud.gob.cl/" target="_blank" style="color:var(--c-green)">rnpi.superdesalud.gob.cl</a></div></div></div><div id="docs-tech" style="display:none"><div class="field-group"><label>CV o Currículum Vitae</label><div class="file-upload-zone"><input type="file" accept=".pdf,.doc,.docx" onchange="handleFile(this,'cv-tech')"><div class="file-upload-icon">📄</div><h4>Arrastra tu CV aquí</h4><p>o haz clic para seleccionar</p></div><div class="upload-formats">PDF, DOC, DOCX · Máx. 5MB</div><div id="preview-cv-tech"></div></div><div class="field-group"><label>Documento que acredite tu formación en informática</label><div class="file-upload-zone"><input type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="handleFileTech(this,'doc-tech')"><div class="file-upload-icon">🖥️</div><h4>Certificado, título o constancia de alumno regular</h4><p>Universidad, instituto técnico o CFT</p></div><div class="upload-formats">PDF, JPG, PNG, DOC · Máx. 8MB</div><div id="preview-doc-tech"></div><div class="doc-scan-box" id="scan-box-tech"><div class="scan-wrap"><div class="scan-file-row"><span class="scan-file-icon">📄</span><div class="scan-file-info"><h5 id="scan-filename-tech">documento.pdf</h5><span>Analizando contenido...</span></div></div><div class="scan-line" style="margin-top:12px"></div></div><div class="scan-status"><div class="scan-spinner"></div><span id="scan-status-text">Verificando que el documento corresponde a formación en informática...</span></div></div><div class="doc-confirmed-badge" id="doc-confirmed-tech"><span class="dcb-icon">💻</span><div class="dcb-info"><h4>✅ Documento de informática verificado</h4><p>El documento fue reconocido como acreditación de formación en computación / informática.<br>Será revisado por el equipo de Nexo antes de activar tu perfil.</p></div><span class="dcb-check">✓</span></div></div><div class="field-group"><label>Certificaciones adicionales (opcional)</label><div class="file-upload-zone"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile(this,'cert-tech')"><div class="file-upload-icon">🏅</div><h4>CompTIA, Cisco, Google, Microsoft, etc.</h4><p>Sube los que tengas (opcional)</p></div><div id="preview-cert-tech"></div></div></div><div class="reg-actions"><button class="btn-back-step" onclick="nextStep(1)">← Atrás</button><button class="btn-next" onclick="nextStep(3)">Continuar →</button></div></div>
+
+    <!-- STEP 3 -->
+    <div class="reg-step" id="reg-step-3"><div class="reg-step-header"><h2>Verificación rápida</h2><p>Un bot te hará unas preguntas cortas para confirmar que eres del área.</p></div><div class="bot-chat" id="bot-chat"></div><div class="bot-input-row" id="bot-input-row"><input class="bot-text-input" id="bot-input" type="text" placeholder="Escribe tu respuesta..." onkeydown="if(event.key==='Enter')botRespond()"><button class="bot-send-btn" onclick="botRespond()">➤</button></div><div id="bot-verified-badge" style="display:none" class="bot-verified"><span>✅</span><span><strong style="color:var(--c-green)">Verificación completada.</strong></span></div><div class="reg-actions"><button class="btn-back-step" onclick="nextStep(2)">← Atrás</button><button class="btn-next" id="btn-next-bot" onclick="irDesdeBot()" disabled>Continuar →</button></div></div>
+
+    <!-- STEP 4 (solo tech) -->
+    <div class="reg-step" id="reg-step-4"><div class="reg-step-header"><h2>Test de nivel técnico</h2><p>15 preguntas de hardware, software y redes para clasificarte.</p></div><div id="test-ui"><div class="test-header"><span class="test-question-num" id="test-qnum">Pregunta 1 de 15</span><span class="test-category-badge" id="test-cat-badge">Hardware</span></div><div class="test-progress-bar"><div class="test-progress-fill" id="test-prog-fill" style="width:6.6%"></div></div><div class="test-question" id="test-question-text">Cargando...</div><div class="test-options" id="test-options"></div><div class="test-nav"><button class="test-skip" onclick="testSkip()">Saltar pregunta</button><button class="btn-next" id="btn-test-next" onclick="testNext()" disabled style="flex:0;padding:13px 28px">Siguiente →</button></div></div><div id="test-result-container" style="display:none"></div><div class="reg-actions"><button class="btn-back-step" onclick="nextStep(3)">← Atrás</button></div></div>
+
+    <!-- STEP 5 -->
+    <div class="reg-step" id="reg-step-5"><div class="reg-step-header"><h2>¡Tu perfil está listo!</h2><p>Revisaremos tus datos en 24-48 horas.</p></div><div id="profile-card-container"></div><div class="profile-pending"><span>⏳</span><div><strong>Revisión pendiente.</strong> Nuestro equipo verificará tus documentos y activará tu perfil. Te notificaremos por correo cuando esté listo para recibir clientes.</div></div><div class="reg-actions" style="justify-content:center"><button class="btn-next" style="flex:0;padding:15px 40px" onclick="goTo('page-home')">Volver al inicio</button><a href="https://wa.me/56900000000?text=Hola,%20acabo%20de%20inscribirme%20en%20Nexo" class="btn-ghost" target="_blank" style="text-decoration:none">Hablar con el equipo</a></div></div>
+  </div>
+</div>
+
+<script>
+// Estado global
+const state = { tipoReg: '', currentStep: 1, archivos: {}, botDone: false, botAnswers: {}, testDone: false, testScore: 0, nivel: '', docTechVerified: false, catAnswers: {} };
+
+// Tema
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('nexo-theme', isLight ? 'light' : 'dark');
+  const themeIcon = document.getElementById('theme-icon');
+  const themeLabel = document.getElementById('theme-label');
+  if (themeIcon) themeIcon.textContent = isLight ? '🌙' : '☀️';
+  if (themeLabel) themeLabel.textContent = isLight ? 'Oscuro' : 'Claro';
+}
+(function initTheme() {
+  if (localStorage.getItem('nexo-theme') === 'light') {
+    document.body.classList.add('light');
+    const themeIcon = document.getElementById('theme-icon');
+    const themeLabel = document.getElementById('theme-label');
+    if (themeIcon) themeIcon.textContent = '🌙';
+    if (themeLabel) themeLabel.textContent = 'Oscuro';
+  }
+})();
+
+// Navegación entre páginas
+function goTo(id) {
+  const cur = document.querySelector('.page.active');
+  const tgt = document.getElementById(id);
+  if (!tgt || tgt === cur) return;
+  cur.classList.add('exit');
+  cur.classList.remove('active');
+  setTimeout(() => {
+    cur.classList.remove('exit');
+    tgt.classList.add('active');
+    tgt.scrollTop = 0;
+    tgt.querySelectorAll('.fu').forEach(e => e.classList.remove('vis'));
+    setTimeout(() => {
+      const ob = new IntersectionObserver((es) => { es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); ob.unobserve(e.target); } }); }, { threshold: 0.1, root: tgt });
+      tgt.querySelectorAll('.fu:not(.vis)').forEach(e => ob.observe(e));
+    }, 80);
+  }, 300);
+}
+function handleHomeSearch() { goTo('page-clientes'); }
+function setSearchFilter(el, cat) { document.querySelectorAll('.sf-pill').forEach(p => p.classList.remove('active')); el.classList.add('active'); }
+
+// Registro
+function resetRegistrationState() {
+  state.tipoReg = ''; state.archivos = {}; state.botDone = false; state.botAnswers = {}; state.testDone = false; state.testScore = 0; state.nivel = ''; state.docTechVerified = false; state.catAnswers = {};
+  document.querySelectorAll('.field-input').forEach(i => i.value = '');
+  document.querySelectorAll('.file-preview, .file-status-ok').forEach(el => el.innerHTML = '');
+  const botChat = document.getElementById('bot-chat'); if (botChat) botChat.innerHTML = '';
+  const verifiedBadge = document.getElementById('bot-verified-badge'); if (verifiedBadge) verifiedBadge.style.display = 'none';
+  const nextBot = document.getElementById('btn-next-bot'); if (nextBot) nextBot.disabled = true;
+  const inputRow = document.getElementById('bot-input-row'); if (inputRow) inputRow.style.display = 'flex';
+  const confirmed = document.getElementById('doc-confirmed-tech'); if (confirmed) confirmed.classList.remove('visible');
+  const scanBox = document.getElementById('scan-box-tech'); if (scanBox) scanBox.classList.remove('visible');
+}
+function validateStep1() {
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const telefono = document.getElementById('f-telefono').value.trim();
+  const region = document.getElementById('f-region').value;
+  if (!nombre) { alert('Por favor ingresa tu nombre.'); return false; }
+  if (!email) { alert('Por favor ingresa tu correo electrónico.'); return false; }
+  if (!email.includes('@') || !email.includes('.')) { alert('Correo electrónico inválido.'); return false; }
+  if (telefono && !/^\+?[0-9\s\-]{8,15}$/.test(telefono)) { alert('Número de teléfono inválido (solo dígitos y opcional +).'); return false; }
+  if (!region) { alert('Selecciona tu región.'); return false; }
+  return true;
+}
+function iniciarRegistro(tipo) {
+  resetRegistrationState();
+  state.tipoReg = tipo;
+  document.getElementById('campo-especialidad-salud').style.display = tipo === 'salud' ? 'block' : 'none';
+  document.getElementById('campo-especialidad-tech').style.display = tipo === 'tech' ? 'block' : 'none';
+  document.getElementById('docs-salud').style.display = tipo === 'salud' ? 'block' : 'none';
+  document.getElementById('docs-tech').style.display = tipo === 'tech' ? 'block' : 'none';
+  document.querySelectorAll('.tech-only').forEach(e => e.style.display = tipo === 'tech' ? 'flex' : 'none');
+  document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('reg-step-1').classList.add('active');
+  updateProgress(1);
+  goTo('page-registro');
+}
+function updateProgress(step) {
+  document.querySelectorAll('.prog-step').forEach(el => { const s = parseInt(el.dataset.step); el.classList.remove('active','done'); if (s<step) el.classList.add('done'); else if (s===step) el.classList.add('active'); });
+}
+function nextStep(step) {
+  if (step === 2 && !validateStep1()) return;
+  if (step === 3) setTimeout(() => initBot(), 100);
+  if (step === 4 && state.tipoReg === 'salud') { buildProfile(); step = 5; }
+  if (step === 4 && state.tipoReg === 'tech') initTest();
+  if (step === 5) buildProfile();
+  state.currentStep = step;
+  document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('reg-step-'+step).classList.add('active');
+  document.getElementById('page-registro').scrollTop = 0;
+  updateProgress(step);
+}
+function irDesdeBot() { state.tipoReg === 'tech' ? nextStep(4) : nextStep(5); }
+
+// Bot verificación
+const botScripts = { salud: [{ from: 'bot', text: 'Hola! Soy el asistente de verificación de Nexo. 👋 Voy a hacerte unas preguntas para confirmar tu experiencia en el área de la salud.' },{ from: 'bot', text: '¿Cuál es tu título profesional y en qué institución lo obtuviste?' },{ from: 'user_input', key: 'titulo' },{ from: 'bot', text: 'Perfecto. ¿Cuánto tiempo llevas ejerciendo como profesional de la salud?' },{ from: 'user_input', key: 'experiencia' },{ from: 'bot', text: '¿Actualmente estás inscrito en el Registro Nacional de Prestadores de la Superintendencia de Salud?' },{ from: 'user_input', key: 'registro' },{ from: 'bot', text: 'Muy bien. Describe brevemente los tratamientos o atenciones que ofreces.' },{ from: 'user_input', key: 'servicios' },{ from: 'bot', text: 'Excelente. Tus respuestas son coherentes con el perfil de un profesional de salud. ✅ Procederemos a validar tus documentos.' },{ from: 'end' }], tech: [{ from: 'bot', text: 'Hola! Soy el asistente de verificación de Nexo. 👋 Te haré unas preguntas cortas para confirmar que eres del área de informática o soporte técnico.' },{ from: 'bot', text: '¿En qué institución estudias o estudiaste informática, computación o carreras afines?' },{ from: 'user_input', key: 'institucion' },{ from: 'bot', text: '¿Qué tipo de servicios técnicos ofreces? (ej: reparación de PC, redes, desarrollo...)' },{ from: 'user_input', key: 'servicios' },{ from: 'bot', text: 'Nombra 2 o 3 herramientas, lenguajes o tecnologías con las que trabajas frecuentemente.' },{ from: 'user_input', key: 'herramientas' },{ from: 'bot', text: '¿Has trabajado como técnico de forma independiente o formal antes? Cuéntame brevemente.' },{ from: 'user_input', key: 'experiencia' },{ from: 'bot', text: 'Muy bien, tus respuestas son consistentes con el perfil técnico. ✅ Ahora pasarás a un test de 15 preguntas para determinar tu nivel.' },{ from: 'end' }] };
+let botQueue = [], botStep = 0, waitingInput = false;
+function initBot() { const script = botScripts[state.tipoReg]; botQueue = JSON.parse(JSON.stringify(script)); botStep = 0; waitingInput = false; document.getElementById('bot-chat').innerHTML = ''; runBotQueue(); }
+function runBotQueue() { if (botStep >= botQueue.length) return; const item = botQueue[botStep]; if (item.from === 'bot') { showTyping(() => { addBotMsg(item.text); botStep++; if (botQueue[botStep] && botQueue[botStep].from === 'user_input') waitingInput = true; else setTimeout(runBotQueue, 400); }); } else if (item.from === 'end') { waitingInput = false; document.getElementById('bot-input-row').style.display = 'none'; document.getElementById('bot-verified-badge').style.display = 'flex'; document.getElementById('btn-next-bot').disabled = false; state.botDone = true; } }
+function botRespond() { if (!waitingInput) return; const inp = document.getElementById('bot-input'), val = inp.value.trim(); if (!val) return; addUserMsg(val); const currentKey = botQueue[botStep]?.key; if (currentKey) state.botAnswers[currentKey] = val; inp.value = ''; waitingInput = false; botStep++; setTimeout(runBotQueue, 500); }
+function addBotMsg(t) { const c = document.getElementById('bot-chat'); const d = document.createElement('div'); d.className = 'bot-msg'; d.innerHTML = `<div class="bot-avatar">🤖</div><div class="bot-bubble">${t}</div>`; c.appendChild(d); c.scrollTop = c.scrollHeight; }
+function addUserMsg(t) { const c = document.getElementById('bot-chat'); const d = document.createElement('div'); d.className = 'user-msg'; d.innerHTML = `<div class="user-bubble">${t}</div>`; c.appendChild(d); c.scrollTop = c.scrollHeight; }
+function showTyping(cb) { const c = document.getElementById('bot-chat'); const d = document.createElement('div'); d.className = 'bot-typing'; d.innerHTML = '<div class="bot-avatar">🤖</div><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>'; c.appendChild(d); c.scrollTop = c.scrollHeight; setTimeout(() => { d.remove(); cb(); }, 900); }
+
+// Test
+const testPreguntas = [{ cat: 'Hardware', q: '¿Qué significa la sigla RAM en computación?', opts: ['Read Access Memory','Random Access Memory','Rapid Access Module','Read And Memory'], ans: 1 },{ cat: 'Hardware', q: '¿Qué tipo de almacenamiento es más rápido en condiciones normales?', opts: ['HDD','DVD-ROM','SSD NVMe M.2','USB 3.0'], ans: 2 },{ cat: 'Hardware', q: '¿Cuál es la función principal de la BIOS/UEFI?', opts: ['Gestionar el SO','Controlar la GPU','Inicializar hardware al encender','Proteger contra virus'], ans: 2 },{ cat: 'Hardware', q: '¿Qué componente regula el voltaje en un PC?', opts: ['Tarjeta madre','Fuente de poder','Disipador','Controlador SATA'], ans: 1 },{ cat: 'Hardware', q: '¿Qué velocidad soporta PCIe 4.0 x16?', opts: ['8 GB/s','16 GB/s','32 GB/s','64 GB/s'], ans: 2 },{ cat: 'Hardware', q: 'PC enciende sin imagen, ¿primer componente a revisar?', opts: ['Disco duro','Fuente de poder','Tarjeta de video','Memoria RAM'], ans: 2 },{ cat: 'Hardware', q: 'Herramienta para medir voltajes', opts: ['Osciloscopio','Multímetro','POST card','Pinzas'], ans: 1 },{ cat: 'Software', q: 'Comando Windows para ver IP', opts: ['netstat','ipconfig','ping','tracert'], ans: 1 },{ cat: 'Software', q: 'Formatear un disco significa', opts: ['Desfragmentar','Borrar datos y preparar sistema de archivos','Clonar','Verificar sectores'], ans: 1 },{ cat: 'Software', q: 'Sistema de archivos nativo de Linux', opts: ['NTFS','FAT32','ext4','exFAT'], ans: 2 },{ cat: 'Software', q: '¿Qué hace "sfc /scannow"?', opts: ['Escanea virus','Repara archivos del sistema','Actualiza drivers','Desfragmenta'], ans: 1 },{ cat: 'Software', q: 'Malware que cifra archivos y pide rescate', opts: ['Spyware','Adware','Ransomware','Trojan'], ans: 2 },{ cat: 'Redes', q: 'Rango de IP privada clase C', opts: ['10.0.0.0/8','172.16.0.0/12','192.168.0.0/16','169.254.0.0/16'], ans: 2 },{ cat: 'Redes', q: 'Capa OSI donde opera un switch', opts: ['Física','Enlace de datos','Red','Transporte'], ans: 1 },{ cat: 'Redes', q: 'Protocolo que asigna IP automáticamente', opts: ['DNS','FTP','DHCP','ICMP'], ans: 2 }];
+let testIdx = 0, testAnswered = false;
+function initTest() { testIdx = 0; state.testScore = 0; testAnswered = false; state.catAnswers = {}; document.getElementById('test-ui').style.display = 'block'; document.getElementById('test-result-container').style.display = 'none'; renderQuestion(); }
+function renderQuestion() { if (testIdx >= testPreguntas.length) { finishTest(); return; } const q = testPreguntas[testIdx]; testAnswered = false; document.getElementById('test-qnum').textContent = `Pregunta ${testIdx+1} de ${testPreguntas.length}`; document.getElementById('test-cat-badge').textContent = q.cat; document.getElementById('test-prog-fill').style.width = ((testIdx/testPreguntas.length)*100)+'%'; document.getElementById('test-question-text').textContent = q.q; document.getElementById('btn-test-next').disabled = true; const optsDiv = document.getElementById('test-options'); optsDiv.innerHTML = ''; q.opts.forEach((opt,i)=>{ const btn = document.createElement('button'); btn.className='test-option'; btn.textContent=opt; btn.onclick=()=>selectOpt(i,btn,optsDiv,q); optsDiv.appendChild(btn); }); }
+function selectOpt(idx,btn,container,q) { if (testAnswered) return; testAnswered=true; container.querySelectorAll('.test-option').forEach((b,i)=>{ b.disabled=true; if(i===q.ans) b.classList.add('correct'); else if(i===idx && idx!==q.ans) b.classList.add('wrong'); }); if(idx===q.ans) { state.testScore++; state.catAnswers[testIdx]=idx; } else { state.catAnswers[testIdx]=-1; } document.getElementById('btn-test-next').disabled=false; }
+function testSkip() { if (testAnswered) return; testIdx++; if(testIdx>=testPreguntas.length) finishTest(); else renderQuestion(); }
+function testNext() { testIdx++; if(testIdx>=testPreguntas.length) finishTest(); else renderQuestion(); }
+function finishTest() { state.testDone=true; const pct=(state.testScore/testPreguntas.length)*100; state.nivel = pct>=75?'senior':(pct>=45?'mid':'junior'); const ld={junior:{icon:'🌱',label:'Junior',color:'yellow',chips:['Soporte básico','Instalación de SO','Formateos'],desc:'Estás comenzando tu camino.'},mid:{icon:'⚙️',label:'Mid-Level',color:'sky',chips:['Diagnóstico avanzado','Redes domésticas','Reparación hardware'],desc:'Buen nivel técnico.'},senior:{icon:'🚀',label:'Senior',color:'green',chips:['Servidores','Redes empresariales','Proyectos TI','Seguridad'],desc:'Excelente dominio técnico.'}}; const d=ld[state.nivel]; const chipHtml=d.chips.map(c=>`<span class="level-chip ${d.color}">${c}</span>`).join(''); const resultHtml=`<div class="level-result-container"><div class="level-result-header"><div class="level-badge ${state.nivel}" style="display:inline-flex; flex-direction:column; align-items:center; gap:8px; border-radius:24px; padding:32px 48px; margin-bottom:24px; background:rgba(251,191,36,.06); border:2px solid rgba(251,191,36,.3);"><span class="level-icon">${d.icon}</span><span class="level-title" style="font-size:2rem; font-weight:800">${d.label}</span><span class="level-score">${state.testScore}/${testPreguntas.length} · ${Math.round(pct)}%</span></div><p class="level-desc" style="margin-bottom:0; margin-top:16px">${d.desc}</p></div><div class="level-bars"><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Rendimiento por área</div><div class="level-bar-row"><span class="level-bar-label">Hardware</span><div class="level-bar-track"><div class="level-bar-fill hw" style="width:${Math.round(pct)}%"></div></div><span class="level-bar-val" style="color:var(--c-violet)">${Math.round(pct)}%</span></div><div class="level-bar-row"><span class="level-bar-label">Software</span><div class="level-bar-track"><div class="level-bar-fill sw" style="width:${Math.round(pct)}%"></div></div><span class="level-bar-val" style="color:var(--c-sky)">${Math.round(pct)}%</span></div><div class="level-bar-row"><span class="level-bar-label">Redes</span><div class="level-bar-track"><div class="level-bar-fill net" style="width:${Math.round(pct)}%"></div></div><span class="level-bar-val" style="color:var(--c-green)">${Math.round(pct)}%</span></div></div><div class="level-type-chips">${chipHtml}</div></div><button class="btn-violet" style="margin:20px auto 0; display:flex" onclick="nextStep(5)">Ver mi perfil provisional →</button>`; document.getElementById('test-ui').style.display='none'; document.getElementById('test-result-container').innerHTML=resultHtml; document.getElementById('test-result-container').style.display='block'; }
+
+// ─── SUPABASE CONFIG ──────────────────────────────────────────────────
+const SUPABASE_URL = 'https://zaolufggfjqtcmowqckb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_fEJuQCTuNtneQpjnfpUuzA_QqnhlmFL';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ─── REGISTRO DE PROFESIONAL → SUPABASE ──────────────────────────────
+// Construcción de perfil y envío al backend
+function buildProfile() {
+  const nombre = document.getElementById('f-nombre').value || '';
+  const apellido = document.getElementById('f-apellido').value || '';
+  const email = document.getElementById('f-email').value || '';
+  const region = document.getElementById('f-region').value || '';
+  const isTech = state.tipoReg === 'tech';
+  const esp = isTech
+    ? (document.getElementById('f-area-tech').value || 'Soporte técnico')
+    : (document.getElementById('f-especialidad').value || 'Kinesiología');
+  const dc = Object.keys(state.archivos).length;
+  const nivelTexto = isTech && state.nivel
+    ? `<span class="pbadge green">${state.nivel.toUpperCase()} · ${state.testScore}/15</span>` : '';
+  document.getElementById('profile-card-container').innerHTML = `
+    <div class="profile-card">
+      <div class="profile-card-header">
+        <div class="profile-avatar ${isTech ? 'tech-av' : 'salud-av'}">${isTech ? '💻' : '🩺'}</div>
+        <div class="profile-info">
+          <h3>${(nombre + ' ' + apellido).trim() || 'Sin nombre'}</h3>
+          <p>${esp}</p>
+          <div class="profile-badges">
+            <span class="pbadge ${isTech ? 'violet' : 'green'}">${isTech ? 'Informática' : 'Salud'}</span>
+            <span class="pbadge sky">🔒 En revisión</span>
+            ${nivelTexto}
+            ${dc > 0 ? `<span class="pbadge green">📎 ${dc} doc(s)</span>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="profile-card-body">
+        <div class="profile-field"><label>Correo</label><span>${email || '—'}</span></div>
+        <div class="profile-field"><label>Región</label><span>${region || '—'}</span></div>
+        <div class="profile-field"><label>Área</label><span>${esp}</span></div>
+        <div class="profile-field"><label>Estado</label><span style="color:var(--c-yellow)">⏳ Pendiente de revisión</span></div>
+        ${isTech && state.nivel ? `<div class="profile-field"><label>Nivel técnico</label><span style="color:var(--c-green)">${state.nivel.toUpperCase()} · ${state.testScore}/15</span></div>` : ''}
+      </div>
+    </div>`;
+  enviarRegistroBackend();
+}
+
+async function enviarRegistroBackend() {
+  const overlay = document.getElementById('send-overlay');
+  overlay.classList.add('open');
+  document.getElementById('send-loading').style.display = 'block';
+  document.getElementById('send-success-box').style.display = 'none';
+
+  const isTech = state.tipoReg === 'tech';
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const apellido = document.getElementById('f-apellido').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const telefono = document.getElementById('f-telefono').value.trim();
+  const region = document.getElementById('f-region').value;
+  const especialidad = isTech
+    ? (document.getElementById('f-area-tech').value || '')
+    : (document.getElementById('f-especialidad').value || '');
+
+  try {
+    const { error } = await supabase.from('profesionales').insert([{
+      nombre,
+      apellido,
+      email,
+      telefono,
+      region,
+      tipo: state.tipoReg,
+      especialidad,
+      nivel: state.nivel || null,
+      test_score: state.testScore || null,
+      estado: 'pendiente'
+    }]);
+
+    if (error) throw error;
+    showSendSuccess();
+  } catch (err) {
+    console.error('Error Supabase:', err);
+    overlay.classList.remove('open');
+    alert('Hubo un problema al guardar tu registro: ' + (err.message || 'Error desconocido'));
+  }
+}
+
+// ─── REGISTRO DE SOLICITUD DE CLIENTE → SUPABASE ─────────────────────
+async function registrarSolicitud(servicio, categoria, descripcion) {
+  try {
+    await supabase.from('solicitudes').insert([{
+      servicio,
+      categoria,
+      descripcion,
+      estado: 'nueva'
+    }]);
+  } catch (err) {
+    console.error('Error registrando solicitud:', err);
+  }
+}
+
+function showSendSuccess() {
+  document.getElementById('send-loading').style.display = 'none';
+  document.getElementById('send-success-box').style.display = 'block';
+}
+function closeSendOverlay() {
+  document.getElementById('send-overlay').classList.remove('open');
+}
+
+// Utilidades para archivos
+function handleFile(input, key) { const f = input.files[0]; if(!f) return; state.archivos[key]=f; const p=document.getElementById('preview-'+key); if(p){ const ext=f.name.split('.').pop().toLowerCase(); const icon={'pdf':'📕','doc':'📝','docx':'📝','jpg':'🖼️','jpeg':'🖼️','png':'🖼️'}[ext]||'📎'; const kb=f.size<1048576?(f.size/1024).toFixed(1)+' KB':(f.size/1048576).toFixed(1)+' MB'; p.innerHTML=`<div class="file-preview"><span class="file-preview-icon">${icon}</span><span class="file-preview-name">${f.name}</span><span style="font-size:.75rem;color:var(--muted);margin-left:auto;padding-left:12px;white-space:nowrap">${kb}</span><button class="file-preview-remove" onclick="removeFile('${key}')">✕</button></div><div class="file-status-ok">✓ Archivo cargado correctamente</div>`; } }
+function removeFile(key) { delete state.archivos[key]; const p=document.getElementById('preview-'+key); if(p) p.innerHTML=''; }
+function handleFileTech(input, key) { const f = input.files[0]; if(!f) return; state.archivos[key]=f; const p=document.getElementById('preview-'+key); if(p){ const ext=f.name.split('.').pop().toLowerCase(); const icon={'pdf':'📕','doc':'📝','docx':'📝','jpg':'🖼️','jpeg':'🖼️','png':'🖼️'}[ext]||'📎'; const kb=f.size<1048576?(f.size/1024).toFixed(1)+' KB':(f.size/1048576).toFixed(1)+' MB'; p.innerHTML=`<div class="file-preview"><span class="file-preview-icon">${icon}</span><span class="file-preview-name">${f.name}</span><span style="font-size:.75rem;color:var(--muted);margin-left:auto;padding-left:12px;white-space:nowrap">${kb}</span><button class="file-preview-remove" onclick="removeFileTech('${key}')">✕</button></div>`; } const scanBox=document.getElementById('scan-box-tech'); const confirmed=document.getElementById('doc-confirmed-tech'); document.getElementById('scan-filename-tech').textContent=f.name; confirmed.classList.remove('visible'); scanBox.classList.add('visible'); const msgs=['Verificando que el documento corresponde a formación en informática...','Detectando palabras clave: computación, TI, software...','Validando estructura del documento...','Confirmando institución educativa...']; let mi=0; const iv=setInterval(()=>{ mi++; if(mi<msgs.length){ document.getElementById('scan-status-text').textContent=msgs[mi]; } else { clearInterval(iv); setTimeout(()=>{ scanBox.classList.remove('visible'); confirmed.classList.add('visible'); state.docTechVerified=true; },500); } },1100); }
+function removeFileTech(key) { delete state.archivos[key]; const p=document.getElementById('preview-'+key); if(p) p.innerHTML=''; document.getElementById('scan-box-tech').classList.remove('visible'); document.getElementById('doc-confirmed-tech').classList.remove('visible'); state.docTechVerified=false; }
+
+// Servicios y modales
+let activePanel = null;
+function toggleServicePanel(cat) { const panel=document.getElementById('panel-'+cat); const card=document.querySelector('.scat-card.'+cat); if(activePanel && activePanel!==cat){ document.getElementById('panel-'+activePanel).classList.remove('open'); document.querySelector('.scat-card.'+activePanel).classList.remove('selected'); document.getElementById('hint-'+activePanel).textContent='Ver servicios disponibles →'; } if(activePanel===cat){ panel.classList.remove('open'); card.classList.remove('selected'); document.getElementById('hint-'+cat).textContent='Ver servicios disponibles →'; activePanel=null; } else { panel.classList.add('open'); card.classList.add('selected'); document.getElementById('hint-'+cat).textContent='Cerrar panel ↑'; activePanel=cat; setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}),100); } }
+function closePanel(cat) { document.getElementById('panel-'+cat).classList.remove('open'); document.querySelector('.scat-card.'+cat).classList.remove('selected'); document.getElementById('hint-'+cat).textContent='Ver servicios disponibles →'; activePanel=null; }
+function openWaModal(servicio, icon, desc) {
+  document.getElementById('wa-service-name').textContent = icon + ' ' + servicio;
+  document.getElementById('wa-service-desc').textContent = desc;
+  const msg = encodeURIComponent(`Hola, necesito el servicio de: *${servicio}*\n${desc}\n\nMe gustaría conocer disponibilidad y precio.`);
+  document.getElementById('wa-btn-go').href = `https://wa.me/56900000000?text=${msg}`;
+  document.getElementById('wa-modal-overlay').classList.add('open');
+  // Registrar solicitud en Supabase
+  const cat = servicio.toLowerCase().includes('kine') || servicio.toLowerCase().includes('salud') || servicio.toLowerCase().includes('rehab') ? 'salud' : 'tech';
+  registrarSolicitud(servicio, cat, desc);
+}
+function closeWaModal() { document.getElementById('wa-modal-overlay').classList.remove('open'); }
+
+// Modal de inscripción (correo)
+function abrirModalCorreo(tipo) { const esSalud = tipo === 'salud'; document.getElementById('inscr-icon').textContent = esSalud ? '🩺' : '💻'; document.getElementById('inscr-titulo').textContent = esSalud ? 'Inscripción · Kinesiología & Salud' : 'Inscripción · Servicio Técnico & TI'; document.getElementById('inscr-sub').innerHTML = esSalud ? 'Envíanos un correo con tu nombre, RUT, especialidad y adjunta tu título o certificado de la Superintendencia de Salud.' : 'Envíanos un correo con tu nombre, área de especialidad y adjunta tu CV o documento que acredite tu formación en informática.'; document.getElementById('inscr-pill').className = 'inscr-type-pill ' + tipo; document.getElementById('inscr-pill').innerHTML = esSalud ? '🩺 Profesional de Salud' : '💻 Técnico en Informática'; document.getElementById('correo-display-box').className = 'correo-display-box ' + tipo; document.getElementById('inscr-gmail-btn').className = 'inscr-gmail-btn ' + tipo; const asunto = encodeURIComponent(esSalud ? '[Nexo] Inscripción Kinesiología & Salud – Mi nombre' : '[Nexo] Inscripción Técnico Informática – Mi nombre'); const cuerpo = encodeURIComponent(esSalud ? 'Hola equipo Nexo,\n\nMe gustaría inscribirme como profesional de salud.\n\nNombre completo: \nRUT: \nEspecialidad: \nRegistro Superintendencia de Salud: \nTeléfono: \nRegión: \n\n(Adjuntar: título y registro vigente)\n\nSaludos,' : 'Hola equipo Nexo,\n\nMe gustaría inscribirme como técnico en informática.\n\nNombre completo: \nRUT: \nÁrea principal: \nNivel (junior/mid/senior): \nTeléfono: \nRegión: \n\n(Adjuntar: CV o certificado de estudios)\n\nSaludos,'); document.getElementById('inscr-gmail-btn').href = `https://mail.google.com/mail/?view=cm&to=nexo@ejemplo.com&su=${asunto}&body=${cuerpo}`; const gmailBtn = document.getElementById('inscr-gmail-btn'); const aviso = document.getElementById('inscr-test-aviso'); const testOk = document.getElementById('inscr-test-ok'); if (tipo === 'tech' && !state.testDone) { gmailBtn.setAttribute('data-disabled','true'); gmailBtn.style.pointerEvents='none'; aviso.classList.add('visible'); testOk.classList.remove('visible'); } else { gmailBtn.removeAttribute('data-disabled'); gmailBtn.style.pointerEvents=''; aviso.classList.remove('visible'); if (tipo === 'tech' && state.testDone) { const nivelLabel = {junior:'🌱 Junior', mid:'⚙️ Mid-Level', senior:'🚀 Senior'}[state.nivel] || ''; testOk.innerHTML = `✅ Test completado · Nivel <strong>${nivelLabel}</strong> · ${state.testScore}/15 correctas`; testOk.classList.add('visible'); } else { testOk.classList.remove('visible'); } } document.getElementById('inscr-overlay').classList.add('open'); document.body.style.overflow = 'hidden'; }
+function cerrarModalCorreo() { document.getElementById('inscr-overlay').classList.remove('open'); document.body.style.overflow = ''; }
+function irAlTestDesdeModal() { cerrarModalCorreo(); state.tipoReg = 'tech'; goTo('page-registro'); setTimeout(() => { const nombre = document.getElementById('f-nombre'); const email = document.getElementById('f-email'); if(nombre && !nombre.value.trim()) nombre.value = 'Pendiente'; if(email && !email.value.trim()) email.value = 'pendiente@completar.cl'; document.getElementById('docs-tech').style.display = 'block'; document.getElementById('docs-salud').style.display = 'none'; nextStep(4); }, 400); }
+function copiarCorreo() { const email = 'nexo@ejemplo.com'; navigator.clipboard.writeText(email).then(() => { document.getElementById('copy-icon').textContent='✅'; document.getElementById('copy-text').textContent='¡Copiado!'; setTimeout(()=>{ document.getElementById('copy-icon').textContent='📋'; document.getElementById('copy-text').textContent='Copiar correo'; },2200); }).catch(()=>{ const el=document.createElement('textarea'); el.value=email; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); document.getElementById('copy-icon').textContent='✅'; document.getElementById('copy-text').textContent='¡Copiado!'; setTimeout(()=>{ document.getElementById('copy-icon').textContent='📋'; document.getElementById('copy-text').textContent='Copiar correo'; },2200); }); }
+
+// Inicialización de animaciones
+document.querySelectorAll('.page.active').forEach(p => { const ob = new IntersectionObserver((es) => { es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); ob.unobserve(e.target); } }); }, { threshold: 0.1 }); p.querySelectorAll('.fu:not(.vis)').forEach(e => ob.observe(e)); });
+</script>
+
+<!-- Modales -->
+<div class="wa-modal-overlay" id="wa-modal-overlay" onclick="if(event.target===this)closeWaModal()"><div class="wa-modal"><div class="wa-modal-icon">💬</div><h3>Solicitar por WhatsApp</h3><p class="wa-modal-desc">Te conectaremos con un profesional verificado para este servicio. El pago queda retenido hasta que estés conforme.</p><div class="wa-service-pill" id="wa-service-name"></div><p style="font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:20px" id="wa-service-desc"></p><div class="wa-modal-btns"><a id="wa-btn-go" href="#" target="_blank" class="btn-green" style="justify-content:center;text-decoration:none" onclick="closeWaModal()">📱 Abrir WhatsApp →</a><button class="wa-btn-cancel" onclick="closeWaModal()">Cancelar</button></div></div></div>
+<div class="send-overlay" id="send-overlay"><div class="send-box"><div id="send-loading"><div class="send-spinner-big"></div><h3>Enviando tu registro</h3><p>Estamos enviando tus datos al equipo de Nexo para verificación.</p></div><div id="send-success-box" style="display:none"><div class="send-success-icon">✅</div><h3 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--c-green);margin-bottom:10px">🎉 Registro enviado</h3><p>Tus datos y documentos llegaron al equipo de Nexo. Revisaremos tu solicitud en <strong>24–48 horas</strong> y te notificaremos por correo cuando tu perfil esté activo.</p><div style="background:var(--surface2);border-radius:14px;padding:16px;margin-bottom:24px;font-size:.8rem;color:var(--muted)"><div>📧 Notificación enviada al equipo</div><div>📂 Documentos en revisión</div><div>⏳ Activación en 24–48 hrs</div></div><button class="btn-violet" style="width:100%;justify-content:center" onclick="closeSendOverlay()">Entendido →</button></div></div></div>
+<div class="inscr-overlay" id="inscr-overlay" onclick="if(event.target===this)cerrarModalCorreo()"><div class="inscr-modal"><button class="inscr-modal-close" onclick="cerrarModalCorreo()">✕</button><div class="inscr-modal-icon" id="inscr-icon">📋</div><h2 id="inscr-titulo">Inscripción profesional</h2><p class="inscr-modal-sub" id="inscr-sub">Envíanos un correo con tu nombre, especialidad y adjunta tu CV o documento de formación.</p><div class="inscr-type-pill" id="inscr-pill">🩺 Profesional de Salud</div><div class="correo-display-box" id="correo-display-box"><div class="correo-label">Escríbenos a</div><div class="correo-address" id="correo-address">nexo@ejemplo.com</div><button class="correo-copy-btn" onclick="copiarCorreo()"><span id="copy-icon">📋</span> <span id="copy-text">Copiar correo</span></button></div><div class="correo-instrucciones"><div class="ci-row"><span class="ci-num">1</span><span>En el <strong>asunto</strong> escribe tu nombre y área</span></div><div class="ci-row"><span class="ci-num">2</span><span>Adjunta tu <strong>CV o certificado de estudios</strong></span></div><div class="ci-row"><span class="ci-num">3</span><span>Cuéntanos brevemente tu <strong>experiencia</strong></span></div><div class="ci-row"><span class="ci-num">4</span><span>Te respondemos en <strong>24–48 horas</strong></span></div></div><div class="inscr-test-aviso" id="inscr-test-aviso">🔒 Debes completar el <strong>test de nivel</strong> (Junior/Mid/Senior) antes de enviar tu inscripción.<button onclick="irAlTestDesdeModal()" style="display:block;width:100%;margin-top:10px;background:var(--c-violet);color:#fff;border:none;border-radius:100px;padding:10px 16px;cursor:pointer">✏️ Ir al test de nivel ahora →</button></div><div class="inscr-test-ok" id="inscr-test-ok"></div><a class="inscr-gmail-btn" id="inscr-gmail-btn" href="#" target="_blank">✉️ Abrir Gmail y enviar correo</a><button class="inscr-modal-cancel" onclick="cerrarModalCorreo()">Cerrar</button></div></div>
+
+</body>
+</html>
