@@ -668,6 +668,14 @@ select.field-input option{background:var(--surface2)}
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const STORAGE_BUCKET = 'documentos';
 
+  // Configuración EmailJS (correo de confirmación al profesional)
+  const EMAILJS_PUBLIC_KEY = 'fBxUAbur2Sn0QYgmcAeKN';
+  const EMAILJS_SERVICE_ID = 'service_bj4zs3g';
+  const EMAILJS_TEMPLATE_ID = 'template_9fdhqr9';
+  if (window.emailjs && EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'TU_PUBLIC_KEY_AQUI') {
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  }
+
   // Estado global
   const state = {
     tipoReg: '',
@@ -1321,7 +1329,7 @@ select.field-input option{background:var(--surface2)}
     document.getElementById('inscr-gmail-btn').className = 'inscr-gmail-btn ' + tipo;
     const asunto = encodeURIComponent(esSalud ? '[Nexo] Inscripción Kinesiología & Salud – Mi nombre' : '[Nexo] Inscripción Técnico Informática – Mi nombre');
     const cuerpo = encodeURIComponent(esSalud ? 'Hola equipo Nexo,\n\nMe gustaría inscribirme como profesional de salud.\n\nNombre completo: \nRUT: \nEspecialidad: \nRegistro Superintendencia de Salud: \nTeléfono: \nRegión: \n\n(Adjuntar: título y registro vigente)\n\nSaludos,' : 'Hola equipo Nexo,\n\nMe gustaría inscribirme como técnico en informática.\n\nNombre completo: \nRUT: \nÁrea principal: \nNivel (junior/mid/senior): \nTeléfono: \nRegión: \n\n(Adjuntar: CV o certificado de estudios)\n\nSaludos,');
-    document.getElementById('inscr-gmail-btn').href = `https://mail.google.com/mail/?view=cm&to=nexo@ejemplo.com&su=${asunto}&body=${cuerpo}`;
+    document.getElementById('inscr-gmail-btn').href = `https://mail.google.com/mail/?view=cm&to=contact.us.nexo@gmail.com&su=${asunto}&body=${cuerpo}`;
     const gmailBtn = document.getElementById('inscr-gmail-btn');
     const aviso = document.getElementById('inscr-test-aviso');
     const testOk = document.getElementById('inscr-test-ok');
@@ -1348,7 +1356,7 @@ select.field-input option{background:var(--surface2)}
     document.body.style.overflow = '';
   };
   window.copiarCorreo = function() {
-    const email = 'nexo@ejemplo.com';
+    const email = 'contact.us.nexo@gmail.com';
     navigator.clipboard.writeText(email).then(() => {
       document.getElementById('copy-icon').textContent='✅';
       document.getElementById('copy-text').textContent='¡Copiado!';
@@ -1378,7 +1386,7 @@ select.field-input option{background:var(--surface2)}
 <!-- Modales -->
 <div class="wa-modal-overlay" id="wa-modal-overlay" onclick="if(event.target===this)window.closeWaModal()"><div class="wa-modal"><div class="wa-modal-icon">💬</div><h3>Solicitar por WhatsApp</h3><p class="wa-modal-desc">Te conectaremos con un profesional verificado para este servicio. El pago queda retenido hasta que estés conforme.</p><div class="wa-service-pill" id="wa-service-name"></div><p style="font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:20px" id="wa-service-desc"></p><div class="wa-modal-btns"><a id="wa-btn-go" href="#" target="_blank" class="btn-green" style="justify-content:center;text-decoration:none" onclick="window.closeWaModal()">📱 Abrir WhatsApp →</a><button class="wa-btn-cancel" onclick="window.closeWaModal()">Cancelar</button></div></div></div>
 <div class="send-overlay" id="send-overlay"><div class="send-box"><div id="send-loading"><div class="send-spinner-big"></div><h3>Enviando tu registro</h3><p id="send-loading-text">Estamos enviando tus datos al equipo de Nexo para verificación.</p></div><div id="send-success-box" style="display:none"><div class="send-success-icon">✅</div><h3 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--c-green);margin-bottom:10px">🎉 Registro enviado</h3><p>Tus datos y documentos llegaron al equipo de Nexo. Revisaremos tu solicitud en <strong>24–48 horas</strong> y te notificaremos por correo cuando tu perfil esté activo.</p><div style="background:var(--surface2);border-radius:14px;padding:16px;margin-bottom:24px;font-size:.8rem;color:var(--muted)"><div>📧 Notificación enviada al equipo</div><div>📂 Documentos en revisión</div><div>⏳ Activación en 24–48 hrs</div></div><button class="btn-violet" style="width:100%;justify-content:center" onclick="window.closeSendOverlay()">Entendido →</button></div></div></div>
-<div class="inscr-overlay" id="inscr-overlay" onclick="if(event.target===this)window.cerrarModalCorreo()"><div class="inscr-modal"><button class="inscr-modal-close" onclick="window.cerrarModalCorreo()">✕</button><div class="inscr-modal-icon" id="inscr-icon">📋</div><h2 id="inscr-titulo">Inscripción profesional</h2><p class="inscr-modal-sub" id="inscr-sub">Envíanos un correo con tu nombre, especialidad y adjunta tu CV o documento de formación.</p><div class="inscr-type-pill" id="inscr-pill">🩺 Profesional de Salud</div><div class="correo-display-box" id="correo-display-box"><div class="correo-label">Escríbenos a</div><div class="correo-address" id="correo-address">nexo@ejemplo.com</div><button class="correo-copy-btn" onclick="window.copiarCorreo()"><span id="copy-icon">📋</span> <span id="copy-text">Copiar correo</span></button></div><div class="correo-instrucciones"><div class="ci-row"><span class="ci-num">1</span><span>En el <strong>asunto</strong> escribe tu nombre y área</span></div><div class="ci-row"><span class="ci-num">2</span><span>Adjunta tu <strong>CV o certificado de estudios</strong></span></div><div class="ci-row"><span class="ci-num">3</span><span>Cuéntanos brevemente tu <strong>experiencia</strong></span></div><div class="ci-row"><span class="ci-num">4</span><span>Te respondemos en <strong>24–48 horas</strong></span></div></div><div class="inscr-test-aviso" id="inscr-test-aviso">🔒 Debes completar el <strong>test de nivel</strong> (Junior/Mid/Senior) antes de enviar tu inscripción.<button onclick="window.irAlTestDesdeModal()" style="display:block;width:100%;margin-top:10px;background:var(--c-violet);color:#fff;border:none;border-radius:100px;padding:10px 16px;cursor:pointer">✏️ Ir al test de nivel ahora →</button></div><div class="inscr-test-ok" id="inscr-test-ok"></div><a class="inscr-gmail-btn" id="inscr-gmail-btn" href="#" target="_blank">✉️ Abrir Gmail y enviar correo</a><button class="inscr-modal-cancel" onclick="window.cerrarModalCorreo()">Cerrar</button></div></div>
+<div class="inscr-overlay" id="inscr-overlay" onclick="if(event.target===this)window.cerrarModalCorreo()"><div class="inscr-modal"><button class="inscr-modal-close" onclick="window.cerrarModalCorreo()">✕</button><div class="inscr-modal-icon" id="inscr-icon">📋</div><h2 id="inscr-titulo">Inscripción profesional</h2><p class="inscr-modal-sub" id="inscr-sub">Envíanos un correo con tu nombre, especialidad y adjunta tu CV o documento de formación.</p><div class="inscr-type-pill" id="inscr-pill">🩺 Profesional de Salud</div><div class="correo-display-box" id="correo-display-box"><div class="correo-label">Escríbenos a</div><div class="correo-address" id="correo-address">contact.us.nexo@gmail.com</div><button class="correo-copy-btn" onclick="window.copiarCorreo()"><span id="copy-icon">📋</span> <span id="copy-text">Copiar correo</span></button></div><div class="correo-instrucciones"><div class="ci-row"><span class="ci-num">1</span><span>En el <strong>asunto</strong> escribe tu nombre y área</span></div><div class="ci-row"><span class="ci-num">2</span><span>Adjunta tu <strong>CV o certificado de estudios</strong></span></div><div class="ci-row"><span class="ci-num">3</span><span>Cuéntanos brevemente tu <strong>experiencia</strong></span></div><div class="ci-row"><span class="ci-num">4</span><span>Te respondemos en <strong>24–48 horas</strong></span></div></div><div class="inscr-test-aviso" id="inscr-test-aviso">🔒 Debes completar el <strong>test de nivel</strong> (Junior/Mid/Senior) antes de enviar tu inscripción.<button onclick="window.irAlTestDesdeModal()" style="display:block;width:100%;margin-top:10px;background:var(--c-violet);color:#fff;border:none;border-radius:100px;padding:10px 16px;cursor:pointer">✏️ Ir al test de nivel ahora →</button></div><div class="inscr-test-ok" id="inscr-test-ok"></div><a class="inscr-gmail-btn" id="inscr-gmail-btn" href="#" target="_blank">✉️ Abrir Gmail y enviar correo</a><button class="inscr-modal-cancel" onclick="window.cerrarModalCorreo()">Cerrar</button></div></div>
 
 </body>
 </html>
