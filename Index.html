@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -30,6 +31,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .page.exit{opacity:0;transform:translateY(-16px);pointer-events:none;z-index:1}
 .blob{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;animation:bdrift 16s ease-in-out infinite alternate}
 @keyframes bdrift{from{transform:translate(0,0)}to{transform:translate(20px,15px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
 .home-blobs .blob:nth-child(1){width:560px;height:560px;background:var(--c-green);top:-180px;left:-140px;opacity:.09}
 .home-blobs .blob:nth-child(2){width:460px;height:460px;background:var(--c-violet);bottom:-130px;right:-100px;opacity:.1;animation-delay:-6s}
 .client-blobs .blob:nth-child(1){width:480px;height:480px;background:var(--c-green);top:-150px;right:-100px;opacity:.1}
@@ -60,6 +62,9 @@ p.ssub{color:var(--muted);font-size:.95rem;max-width:520px;line-height:1.75;marg
 .theme-btn:hover{color:var(--text);border-color:rgba(255,255,255,.18)}
 body.light .theme-btn:hover{border-color:rgba(0,0,0,.18)}
 .home-search-wrap{width:100%;max-width:640px;margin:0 auto 20px;position:relative}
+.search-feedback{font-size:.82rem;color:var(--c-green);text-align:center;margin-top:12px;min-height:1.2em;opacity:0;transform:translateY(-4px);transition:opacity .25s ease,transform .25s ease}
+.search-feedback.visible{opacity:1;transform:translateY(0)}
+.search-feedback .sf-spinner{display:inline-block;width:11px;height:11px;border:2px solid rgba(94,245,176,.25);border-top-color:var(--c-green);border-radius:50%;animation:spin .8s linear infinite;margin-right:7px;vertical-align:middle}
 .home-search-inner{display:flex;align-items:center;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:6px 6px 6px 22px;transition:border-color .25s;box-shadow:var(--shadow-sm)}
 .home-search-inner:focus-within{border-color:rgba(94,245,176,.4)}
 .home-search-icon{font-size:1rem;color:var(--muted);flex-shrink:0;margin-right:4px}
@@ -138,6 +143,7 @@ body.light .dest-card{box-shadow:var(--shadow-sm)}
 body.light .home-search-inner{box-shadow:0 2px 16px rgba(80,60,160,.1)}
 @media(max-width:900px){.dest-grid{grid-template-columns:1fr 1fr}.cats-grid{grid-template-columns:1fr 1fr}.how-steps{grid-template-columns:1fr 1fr;gap:24px}.how-steps::before{display:none}}
 @media(max-width:600px){.dest-grid{grid-template-columns:1fr}.cats-grid{grid-template-columns:1fr 1fr}.how-steps{grid-template-columns:1fr}.pro-banner{flex-direction:column;padding:28px 20px}.pro-banner-text{text-align:center}.pro-banner-text .mini-checks{justify-content:center}}
+@media(max-width:480px){.dest-grid{grid-template-columns:1fr}.cats-grid{grid-template-columns:1fr}}
 .home-hero{min-height:calc(100vh - 62px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 0 60px}
 .home-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:100px;padding:6px 18px;margin-bottom:40px;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .home-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--c-green);animation:pulse 2s infinite}
@@ -437,6 +443,25 @@ select.field-input option{background:var(--surface2)}
 .inscr-test-ok.visible{display:block}
 .inscr-modal-cancel{background:none;border:1px solid var(--border);border-radius:100px;padding:11px 24px;width:100%;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--muted);cursor:pointer;transition:all .2s}
 .inscr-modal-cancel:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.admin-container{max-width:760px;margin:0 auto;padding:60px 28px 80px}
+.admin-error{color:var(--c-red);font-size:.85rem;margin:-4px 0 16px;display:none}
+.admin-error.visible{display:block}
+.admin-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.admin-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.admin-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:20px 22px;margin-bottom:14px}
+.admin-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.admin-card-head strong{font-family:'Syne',sans-serif;font-size:1rem;margin-right:10px}
+.admin-tag{font-size:.68rem;border-radius:100px;padding:3px 11px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.admin-estado{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.admin-card-body{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin-bottom:14px}
+.admin-card-body label{display:block;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.admin-card-body span{font-size:.88rem}
+.admin-doc-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.admin-doc-link{font-size:.78rem;color:var(--c-violet);text-decoration:none;background:rgba(157,127,245,.08);border:1px solid rgba(157,127,245,.2);border-radius:100px;padding:5px 14px}
+.admin-doc-link:hover{background:rgba(157,127,245,.15)}
+.admin-actions{display:flex;gap:10px;flex-wrap:wrap}
+.admin-empty{color:var(--muted);font-size:.9rem;text-align:center;padding:40px 0}
+@media(max-width:600px){.admin-card-body{grid-template-columns:1fr}}
 @media(max-width:860px){
   .client-hero,.pro-hero{grid-template-columns:1fr;gap:40px}
   .steps-grid,.pro-steps-grid{grid-template-columns:1fr 1fr}
@@ -474,7 +499,8 @@ select.field-input option{background:var(--surface2)}
     <h1>Encuentra al experto.<br><span class="word-nexo">Nexo</span> te conecta.</h1>
     <p class="home-sub">Técnicos e informáticos verificados, kinesiólogos titulados &mdash; con pago 100% seguro hasta que quedes conforme.</p>
     <div class="home-search-wrap fu">
-      <div class="home-search-inner"><span class="home-search-icon">🔍</span><input class="home-search-input" id="home-search" type="text" placeholder="¿Qué necesitas? Ej: reparación de PC, kinesiología..."><button class="home-search-btn" onclick="handleHomeSearch()">Buscar</button></div>
+      <div class="home-search-inner"><span class="home-search-icon">🔍</span><input class="home-search-input" id="home-search" type="text" placeholder="¿Qué necesitas? Ej: reparación de PC, kinesiología..." onkeydown="if(event.key==='Enter')handleHomeSearch()"><button class="home-search-btn" onclick="handleHomeSearch()">Buscar</button></div>
+      <div class="search-feedback" id="search-feedback"></div>
     </div>
     <div class="search-filters fu" id="search-filters">
       <button class="sf-pill active" data-cat="todos" onclick="setSearchFilter(this,'todos')">Todos</button>
@@ -501,14 +527,14 @@ select.field-input option{background:var(--surface2)}
       <div class="dest-card sky"><div class="dest-avatar-wrap"><div class="dest-avatar sky">⚔️</div><span class="dest-badge sky">Mid TI</span></div><div><div class="dest-name">Levi Ackerman</div><div class="dest-role">Técnico TI · Reparación &amp; Soporte</div></div><div class="dest-stars">★★★★☆ <span style="color:var(--muted);font-weight:400">4.7</span></div><div class="dest-tag-row"><span class="dest-tag">Hardware</span><span class="dest-tag">Soporte</span><span class="dest-tag">Domicilio</span></div><div class="dest-stats"><span class="dest-stat"><strong>88</strong> servicios</span><span class="dest-stat"><strong>Biobío</strong> Región</span></div></div>
     </div></div>
     <div class="cats-section fu"><div class="cats-intro"><p class="slabel g">¿En qué área necesitas ayuda?</p><h2 class="sh">Servicios disponibles en Nexo.</h2><p class="ssub">Desde tu PC hasta tu rehabilitación. Todo bajo el mismo techo y con el mismo pago seguro.</p></div><div class="cats-grid">
-      <div class="cat-block" style="--cat-clr:var(--c-violet)" onclick="goTo('page-clientes')"><div class="cat-block-ico">💻</div><h4>Soporte técnico</h4><p>PCs lentas, pantallas negras, software que no arranca. Lo arreglamos.</p><span class="cat-block-count">7 servicios</span></div>
-      <div class="cat-block" style="--cat-clr:var(--c-sky)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🌐</div><h4>Redes &amp; WiFi</h4><p>Instalación, configuración y extensión de cobertura. Sin puntos ciegos.</p><span class="cat-block-count">3 servicios</span></div>
-      <div class="cat-block" style="--cat-clr:var(--c-green)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🩺</div><h4>Kinesiología</h4><p>Titulados inscritos en Superintendencia de Salud. A tu domicilio.</p><span class="cat-block-count">7 especialidades</span></div>
-      <div class="cat-block" style="--cat-clr:var(--c-pink)" onclick="goTo('page-clientes')"><div class="cat-block-ico">💾</div><h4>Recuperación de datos</h4><p>Discos duros, pendrives, particiones corruptas. Rescatamos lo que necesitas.</p><span class="cat-block-count">Especialidad</span></div>
-      <div class="cat-block" style="--cat-clr:var(--c-yellow)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🛡️</div><h4>Seguridad &amp; virus</h4><p>Limpieza de malware, firewall, protección real. No solo antivirus.</p><span class="cat-block-count">2 servicios</span></div>
-      <div class="cat-block" style="--cat-clr:var(--c-sky)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🖥️</div><h4>Soporte remoto</h4><p>Sin que nadie tenga que moverse. Conexión, diagnóstico y solución al tiro.</p><span class="cat-block-count">Disponible</span></div>
-      <div class="cat-block" style="--cat-clr:var(--c-green)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🦴</div><h4>Rehabilitación</h4><p>Post-operatoria, traumática, deportiva. Te acompañamos hasta recuperarte.</p><span class="cat-block-count">4 especialidades</span></div>
-      <div class="cat-block" style="--cat-clr:var(--c-violet)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🫁</div><h4>Salud respiratoria</h4><p>EPOC, asma, post-COVID. Kinesiólogos especializados en rehabilitación pulmonar.</p><span class="cat-block-count">Especialidad</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-violet)" onclick="goTo('page-clientes')"><div class="cat-block-ico">💻</div><h4>Soporte técnico</h4><p>PCs lentas, pantallas negras, software que no arranca. Lo arreglamos.</p><span class="cat-block-count" id="count-soporte">Cargando…</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-sky)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🌐</div><h4>Redes &amp; WiFi</h4><p>Instalación, configuración y extensión de cobertura. Sin puntos ciegos.</p><span class="cat-block-count" id="count-redes">Cargando…</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-green)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🩺</div><h4>Kinesiología</h4><p>Titulados inscritos en Superintendencia de Salud. A tu domicilio.</p><span class="cat-block-count" id="count-kine">Cargando…</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-pink)" onclick="goTo('page-clientes')"><div class="cat-block-ico">💾</div><h4>Recuperación de datos</h4><p>Discos duros, pendrives, particiones corruptas. Rescatamos lo que necesitas.</p><span class="cat-block-count" id="count-datos">Cargando…</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-yellow)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🛡️</div><h4>Seguridad &amp; virus</h4><p>Limpieza de malware, firewall, protección real. No solo antivirus.</p><span class="cat-block-count" id="count-seguridad">Cargando…</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-sky)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🖥️</div><h4>Soporte remoto</h4><p>Sin que nadie tenga que moverse. Conexión, diagnóstico y solución al tiro.</p><span class="cat-block-count" id="count-remoto">Cargando…</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-green)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🦴</div><h4>Rehabilitación</h4><p>Post-operatoria, traumática, deportiva. Te acompañamos hasta recuperarte.</p><span class="cat-block-count" id="count-rehab">Cargando…</span></div>
+      <div class="cat-block" style="--cat-clr:var(--c-violet)" onclick="goTo('page-clientes')"><div class="cat-block-ico">🫁</div><h4>Salud respiratoria</h4><p>EPOC, asma, post-COVID. Kinesiólogos especializados en rehabilitación pulmonar.</p><span class="cat-block-count" id="count-respiratoria">Cargando…</span></div>
     </div></div>
     <div class="how-section fu"><div class="how-intro"><p class="slabel g">El proceso</p><h2 class="sh">Cuatro pasos. Sin letra chica.</h2><p class="ssub">Diseñado para que ni el cliente ni el profesional quede expuesto. El dinero siempre tiene dueño claro.</p></div><div class="how-steps">
       <div class="how-step"><div class="how-step-dot">💬</div><h4>Solicitas</h4><p>Escríbenos por WhatsApp con lo que necesitas. Sin formularios eternos.</p></div>
@@ -540,7 +566,7 @@ select.field-input option{background:var(--surface2)}
     <div class="escrow-section"><p class="slabel g fu">Tu dinero, protegido</p><h2 class="sh fu">Sistema de pago en garantía.</h2><p class="ssub fu">Nadie pierde. Solo liberas el dinero cuando el trabajo quedó como acordaste.</p><div class="escrow-box fu"><div class="escrow-flow"><div class="e-node"><div class="ico">👤</div><strong>Cliente</strong><small>Paga 100%</small></div><div class="e-arrow">→</div><div class="e-node hl"><div class="ico">🔒</div><strong>Nexo (Escrow)</strong><small>Retiene fondos</small></div><div class="e-arrow">→</div><div class="e-node"><div class="ico">✅</div><strong>Confirmación</strong><small>Trabajo validado</small></div><div class="e-arrow">→</div><div class="e-node"><div class="ico">🎯</div><strong>Profesional</strong><small>Recibe el pago</small></div></div><p class="escrow-note">Si el trabajo no se realiza, <strong>recuperas tu dinero íntegro</strong>. Si todo está correcto, el profesional recibe su pago completo al momento de confirmar el trabajo realizado.</p></div></div>
     <div class="client-cta-bottom"><h2 class="fu">¿Listo para solicitar?</h2><p class="fu">Escríbenos ahora y te conectamos con un profesional verificado.</p><a href="https://wa.me/56900000000?text=Hola,%20necesito%20un%20servicio" class="btn-green fu" target="_blank">Solicitar por WhatsApp →</a></div>
   </div></main>
-  <footer class="page-footer"><div class="wrap footer-inner"><div class="footer-logo">Nexo</div><span>¿Eres profesional? <b style="cursor:pointer;color:var(--c-violet)" onclick="goTo('page-pro')">Inscríbete aquí →</b></span><span>Chile · 2026</span></div></footer>
+  <footer class="page-footer"><div class="wrap footer-inner"><div class="footer-logo">Nexo</div><span>¿Eres profesional? <b style="cursor:pointer;color:var(--c-violet)" onclick="goTo('page-pro')">Inscríbete aquí →</b></span><span>Chile · 2026 · <span style="cursor:pointer;opacity:.5" onclick="goTo('page-admin');checkAdminSession();" title="Panel interno">admin</span></span></div></footer>
 </div>
 
 <!-- ================= PAGE PROFESIONALES ================= -->
@@ -579,6 +605,41 @@ select.field-input option{background:var(--surface2)}
   </div>
 </div>
 
+<!-- ================= PAGE ADMIN ================= -->
+<div class="page" id="page-admin">
+  <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo" onclick="goTo('page-home')" style="cursor:pointer">Nexo</div><div style="display:flex;gap:8px;align-items:center"><span style="color:var(--muted);font-size:.78rem">Panel interno</span><button class="theme-btn" onclick="toggleTheme()" aria-label="Cambiar tema">🌓</button><button class="nav-back" onclick="goTo('page-home')"><span>&larr;</span> Volver al inicio</button></div></div></nav>
+  <main><div class="wrap admin-container">
+
+    <div id="admin-login-box">
+      <p class="slabel v">Acceso restringido</p>
+      <h2 class="sh">Panel de administración</h2>
+      <p class="ssub">Inicia sesión con tu cuenta de Supabase para revisar y aprobar profesionales.</p>
+      <div class="field-group"><label>Correo</label><input class="field-input" id="admin-email" type="email" placeholder="admin@nexo.cl" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+      <div class="field-group"><label>Contraseña</label><input class="field-input" id="admin-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+      <div id="admin-login-error" class="admin-error"></div>
+      <button class="btn-violet" onclick="adminLogin()">Ingresar →</button>
+    </div>
+
+    <div id="admin-dashboard" style="display:none">
+      <div class="admin-header">
+        <div>
+          <p class="slabel v" style="margin-bottom:6px">Panel de administración</p>
+          <h2 class="sh" style="margin-bottom:0">Profesionales registrados</h2>
+        </div>
+        <button class="btn-ghost" onclick="adminLogout()">Cerrar sesión</button>
+      </div>
+      <div class="admin-filters">
+        <button class="sf-pill active" data-estado="pendiente" onclick="filtrarAdmin('pendiente',this)">⏳ Pendientes</button>
+        <button class="sf-pill" data-estado="aprobado" onclick="filtrarAdmin('aprobado',this)">✅ Aprobados</button>
+        <button class="sf-pill" data-estado="rechazado" onclick="filtrarAdmin('rechazado',this)">✕ Rechazados</button>
+        <button class="sf-pill" data-estado="todos" onclick="filtrarAdmin('todos',this)">Todos</button>
+      </div>
+      <div id="admin-list"></div>
+    </div>
+
+  </div></main>
+</div>
+
 <script>
 // Estado global
 const state = { tipoReg: '', currentStep: 1, archivos: {}, botDone: false, botAnswers: {}, testDone: false, testScore: 0, nivel: '', docTechVerified: false, catAnswers: {} };
@@ -602,6 +663,12 @@ function toggleTheme() {
   }
 })();
 
+// Animaciones de scroll (.fu) — observa dentro del contenedor de la página, no del viewport
+function observeFu(container) {
+  const ob = new IntersectionObserver((es) => { es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); ob.unobserve(e.target); } }); }, { threshold: 0.1, root: container });
+  container.querySelectorAll('.fu:not(.vis)').forEach(e => ob.observe(e));
+}
+
 // Navegación entre páginas
 function goTo(id) {
   const cur = document.querySelector('.page.active');
@@ -614,13 +681,44 @@ function goTo(id) {
     tgt.classList.add('active');
     tgt.scrollTop = 0;
     tgt.querySelectorAll('.fu').forEach(e => e.classList.remove('vis'));
-    setTimeout(() => {
-      const ob = new IntersectionObserver((es) => { es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); ob.unobserve(e.target); } }); }, { threshold: 0.1, root: tgt });
-      tgt.querySelectorAll('.fu:not(.vis)').forEach(e => ob.observe(e));
-    }, 80);
+    setTimeout(() => observeFu(tgt), 80);
   }, 300);
 }
-function handleHomeSearch() { goTo('page-clientes'); }
+function handleHomeSearch() {
+  const input = document.getElementById('home-search');
+  const fb = document.getElementById('search-feedback');
+  const term = input.value.trim();
+
+  // Sin texto: redirige directo, sin mensaje
+  if (!term) { goTo('page-clientes'); return; }
+
+  // Diccionario simple de palabras clave por categoría
+  const keywordsSalud = ['kine','kinesi','salud','rehabilit','fisio','dolor','lesion','lesión','terapia','espalda','rodilla','postoperator','deportiv','pediatr','geriatr','respirator','neurolog'];
+  const keywordsTech = ['pc','computador','notebook','laptop','tecnic','técnic','software','hardware','red','wifi','redes','virus','dato','disco','formate','soporte','sistema','informatic','informátic'];
+
+  const lower = term.toLowerCase();
+  const matchSalud = keywordsSalud.some(k => lower.includes(k));
+  const matchTech = keywordsTech.some(k => lower.includes(k));
+
+  let mensaje, cat;
+  if (matchSalud && !matchTech) { mensaje = `🔍 Buscando kinesiólogos para "${term}"...`; cat = 'salud'; }
+  else if (matchTech && !matchSalud) { mensaje = `🔍 Buscando técnicos para "${term}"...`; cat = 'tech'; }
+  else { mensaje = `🔍 Buscando profesionales para "${term}"...`; cat = null; }
+
+  fb.textContent = mensaje;
+  fb.innerHTML = `<span class="sf-spinner"></span>${mensaje}`;
+  fb.classList.add('visible');
+
+  setTimeout(() => {
+    fb.classList.remove('visible');
+    if (cat) {
+      const pill = document.querySelector(`.sf-pill[data-cat="${cat}"]`);
+      if (pill) setSearchFilter(pill, cat);
+    }
+    goTo('page-clientes');
+    if (cat) setTimeout(() => toggleServicePanel(cat), 450);
+  }, 850);
+}
 function setSearchFilter(el, cat) { document.querySelectorAll('.sf-pill').forEach(p => p.classList.remove('active')); el.classList.add('active'); }
 
 // Registro
@@ -642,7 +740,7 @@ function validateStep1() {
   const region = document.getElementById('f-region').value;
   if (!nombre) { alert('Por favor ingresa tu nombre.'); return false; }
   if (!email) { alert('Por favor ingresa tu correo electrónico.'); return false; }
-  if (!email.includes('@') || !email.includes('.')) { alert('Correo electrónico inválido.'); return false; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { alert('Ingresa un correo electrónico válido (ej: nombre@dominio.cl).'); return false; }
   if (telefono && !/^\+?[0-9\s\-]{8,15}$/.test(telefono)) { alert('Número de teléfono inválido (solo dígitos y opcional +).'); return false; }
   if (!region) { alert('Selecciona tu región.'); return false; }
   return true;
@@ -702,6 +800,23 @@ const SUPABASE_URL = 'https://zaolufggfjqtcmowqckb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_fEJuQCTuNtneQpjnfpUuzA_QqnhlmFL';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Bucket público de Supabase Storage donde se guardan CVs, títulos y certificados
+const STORAGE_BUCKET = 'documentos';
+
+// ─── EMAILJS CONFIG (correo de confirmación al profesional) ──────────
+// 1. Crea una cuenta gratis en https://www.emailjs.com/
+// 2. Conecta un servicio (ej: Gmail) -> copia el "Service ID"
+// 3. Crea una plantilla con variables {{to_name}}, {{to_email}}, {{tipo}} -> copia el "Template ID"
+// 4. En "Account" copia tu "Public Key"
+// 5. Reemplaza los 3 valores de abajo. Si los dejas como están, el envío de
+//    correo simplemente fallará en silencio (el registro se guarda igual).
+const EMAILJS_PUBLIC_KEY = 'TU_PUBLIC_KEY_AQUI';
+const EMAILJS_SERVICE_ID = 'TU_SERVICE_ID_AQUI';
+const EMAILJS_TEMPLATE_ID = 'TU_TEMPLATE_ID_AQUI';
+if (window.emailjs && EMAILJS_PUBLIC_KEY !== 'TU_PUBLIC_KEY_AQUI') {
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+}
+
 // ─── REGISTRO DE PROFESIONAL → SUPABASE ──────────────────────────────
 // Construcción de perfil y envío al backend
 function buildProfile() {
@@ -744,9 +859,11 @@ function buildProfile() {
 
 async function enviarRegistroBackend() {
   const overlay = document.getElementById('send-overlay');
+  const loadingText = document.getElementById('send-loading-text');
   overlay.classList.add('open');
   document.getElementById('send-loading').style.display = 'block';
   document.getElementById('send-success-box').style.display = 'none';
+  loadingText.textContent = 'Estamos enviando tus datos al equipo de Nexo para verificación.';
 
   const isTech = state.tipoReg === 'tech';
   const nombre = document.getElementById('f-nombre').value.trim();
@@ -757,8 +874,19 @@ async function enviarRegistroBackend() {
   const especialidad = isTech
     ? (document.getElementById('f-area-tech').value || '')
     : (document.getElementById('f-especialidad').value || '');
+  const regSuperEl = document.getElementById('f-reg-super');
+  const regSuper = (!isTech && regSuperEl) ? regSuperEl.value.trim() || null : null;
 
   try {
+    // 1. Subir documentos a Supabase Storage (bucket público "documentos")
+    let documentos = null;
+    if (Object.keys(state.archivos).length > 0) {
+      loadingText.textContent = 'Subiendo tus documentos...';
+      documentos = await subirArchivos(nombre, apellido);
+    }
+
+    // 2. Guardar el registro en la tabla "profesionales"
+    loadingText.textContent = 'Guardando tu registro...';
     const { error } = await supabase.from('profesionales').insert([{
       nombre,
       apellido,
@@ -767,18 +895,58 @@ async function enviarRegistroBackend() {
       region,
       tipo: state.tipoReg,
       especialidad,
+      reg_super: regSuper,
+      documentos,
       nivel: state.nivel || null,
       test_score: state.testScore || null,
       estado: 'pendiente'
     }]);
 
     if (error) throw error;
+
+    // 3. Enviar correo de confirmación al profesional (no bloquea el flujo si falla)
+    enviarCorreoConfirmacion(nombre, apellido, email, state.tipoReg);
+
     showSendSuccess();
   } catch (err) {
     console.error('Error Supabase:', err);
     overlay.classList.remove('open');
     alert('Hubo un problema al guardar tu registro: ' + (err.message || 'Error desconocido'));
   }
+}
+
+// ─── SUBIDA DE ARCHIVOS A SUPABASE STORAGE ────────────────────────────
+// Sube cada archivo de state.archivos al bucket público "documentos" y
+// devuelve un objeto { clave: urlPublica } para guardar como jsonb.
+async function subirArchivos(nombre, apellido) {
+  const documentos = {};
+  const carpeta = `${state.tipoReg}/${Date.now()}_${(nombre + '-' + apellido).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'sin-nombre'}`;
+
+  for (const [key, file] of Object.entries(state.archivos)) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    const path = `${carpeta}/${key}.${ext}`;
+    const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
+    if (error) { console.error(`Error subiendo ${key}:`, error); continue; }
+    const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    documentos[key] = data.publicUrl;
+  }
+  return Object.keys(documentos).length > 0 ? documentos : null;
+}
+
+// ─── EMAIL DE CONFIRMACIÓN AL PROFESIONAL (EmailJS) ──────────────────
+function enviarCorreoConfirmacion(nombre, apellido, email, tipo) {
+  if (!window.emailjs || EMAILJS_PUBLIC_KEY === 'TU_PUBLIC_KEY_AQUI') {
+    console.warn('EmailJS no configurado: omitiendo correo de confirmación.');
+    return;
+  }
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    to_name: (nombre + ' ' + apellido).trim() || 'Profesional',
+    to_email: email,
+    tipo: tipo === 'tech' ? 'Servicio Técnico & TI' : 'Kinesiología & Salud'
+  }).catch(err => console.error('Error enviando correo de confirmación:', err));
 }
 
 // ─── REGISTRO DE SOLICITUD DE CLIENTE → SUPABASE ─────────────────────
@@ -795,7 +963,131 @@ async function registrarSolicitud(servicio, categoria, descripcion) {
   }
 }
 
+// ─── CONTADOR REAL DE CATEGORÍAS ──────────────────────────────────────
+// Mapeo aproximado: cada bloque de categoría cuenta profesionales aprobados
+// cuyo `tipo` y `especialidad` calzan con la categoría. Si tu tabla
+// `profesionales` aún no tiene profesionales con estado='aprobado',
+// todos mostrarán "Próximamente".
+const categoryMap = {
+  'count-soporte':     { tipo: 'tech',  especialidades: ['Soporte técnico general','Reparación de hardware','Sistemas operativos'] },
+  'count-redes':       { tipo: 'tech',  especialidades: ['Redes y conectividad'] },
+  'count-kine':        { tipo: 'salud', especialidades: ['Kinesiología general'] },
+  'count-datos':       { tipo: 'tech',  especialidades: ['Recuperación de datos'] },
+  'count-seguridad':   { tipo: 'tech',  especialidades: ['Seguridad informática'] },
+  'count-remoto':      { tipo: 'tech',  especialidades: null }, // cualquier técnico puede dar soporte remoto
+  'count-rehab':       { tipo: 'salud', especialidades: ['Traumatología y ortopedia','Neurológica','Cardiorrespiratoria','Deportiva','Geriátrica'] },
+  'count-respiratoria':{ tipo: 'salud', especialidades: ['Cardiorrespiratoria'] }
+};
+async function cargarContadores() {
+  try {
+    const { data, error } = await supabase.from('profesionales').select('tipo,especialidad').eq('estado', 'aprobado');
+    if (error) throw error;
+    Object.entries(categoryMap).forEach(([id, cfg]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const count = (data || []).filter(p => p.tipo === cfg.tipo && (!cfg.especialidades || cfg.especialidades.includes(p.especialidad))).length;
+      el.textContent = count > 0 ? `${count} profesional${count === 1 ? '' : 'es'}` : 'Próximamente';
+    });
+  } catch (err) {
+    console.error('Error cargando contadores:', err);
+    Object.keys(categoryMap).forEach(id => { const el = document.getElementById(id); if (el) el.textContent = 'Próximamente'; });
+  }
+}
+
+// ─── PANEL DE ADMIN (Supabase Auth) ───────────────────────────────────
+// Requiere que crees un usuario en Supabase Dashboard → Authentication → Users
+// y que apliques las políticas RLS de "profesionales" descritas en el SQL adjunto.
+let adminProfesionales = [];
+
+async function checkAdminSession() {
+  try {
+    const { data } = await supabase.auth.getSession();
+    if (data && data.session) mostrarDashboardAdmin();
+  } catch (err) { console.error('Error verificando sesión admin:', err); }
+}
+
+async function adminLogin() {
+  const email = document.getElementById('admin-email').value.trim();
+  const pass = document.getElementById('admin-pass').value;
+  const errEl = document.getElementById('admin-login-error');
+  errEl.classList.remove('visible');
+  if (!email || !pass) { errEl.textContent = 'Ingresa correo y contraseña.'; errEl.classList.add('visible'); return; }
+  const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+  if (error) { errEl.textContent = 'Credenciales incorrectas o cuenta no autorizada.'; errEl.classList.add('visible'); return; }
+  mostrarDashboardAdmin();
+}
+
+async function adminLogout() {
+  await supabase.auth.signOut();
+  document.getElementById('admin-login-box').style.display = 'block';
+  document.getElementById('admin-dashboard').style.display = 'none';
+  document.getElementById('admin-pass').value = '';
+}
+
+function mostrarDashboardAdmin() {
+  document.getElementById('admin-login-box').style.display = 'none';
+  document.getElementById('admin-dashboard').style.display = 'block';
+  cargarPanelAdmin();
+}
+
+async function cargarPanelAdmin() {
+  const list = document.getElementById('admin-list');
+  list.innerHTML = '<p class="admin-empty">Cargando...</p>';
+  const { data, error } = await supabase.from('profesionales').select('*').order('id', { ascending: false });
+  if (error) { list.innerHTML = `<p class="admin-empty" style="color:var(--c-red)">Error cargando datos: ${error.message}</p>`; return; }
+  adminProfesionales = data || [];
+  const activeBtn = document.querySelector('.admin-filters .sf-pill.active');
+  filtrarAdmin(activeBtn ? activeBtn.dataset.estado : 'pendiente');
+}
+
+function filtrarAdmin(estado, el) {
+  if (el) { document.querySelectorAll('.admin-filters .sf-pill').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
+  const list = document.getElementById('admin-list');
+  const filtrados = estado === 'todos' ? adminProfesionales : adminProfesionales.filter(p => p.estado === estado);
+  if (filtrados.length === 0) { list.innerHTML = '<p class="admin-empty">No hay registros en esta categoría.</p>'; return; }
+  list.innerHTML = filtrados.map(renderAdminCard).join('');
+}
+
+function renderAdminCard(p) {
+  const docs = p.documentos && Object.keys(p.documentos).length
+    ? Object.entries(p.documentos).map(([k, url]) => `<a href="${url}" target="_blank" class="admin-doc-link">📎 ${k}</a>`).join('')
+    : '<span style="color:var(--muted);font-size:.78rem">Sin documentos adjuntos</span>';
+  const estadoColor = { pendiente: 'var(--c-yellow)', aprobado: 'var(--c-green)', rechazado: 'var(--c-red)' }[p.estado] || 'var(--muted)';
+  const acciones = p.estado === 'pendiente'
+    ? `<button class="btn-green" style="padding:9px 20px;font-size:.82rem" onclick="actualizarEstado(${p.id},'aprobado')">✅ Aprobar</button>
+       <button class="btn-ghost" style="padding:9px 20px;font-size:.82rem;border-color:rgba(248,113,113,.4);color:var(--c-red)" onclick="actualizarEstado(${p.id},'rechazado')">✕ Rechazar</button>`
+    : `<button class="btn-ghost" style="padding:9px 20px;font-size:.82rem" onclick="actualizarEstado(${p.id},'pendiente')">↺ Volver a pendiente</button>`;
+  return `<div class="admin-card">
+    <div class="admin-card-head">
+      <div><strong>${p.nombre || ''} ${p.apellido || ''}</strong><span class="admin-tag">${p.tipo === 'tech' ? '💻 Técnico/TI' : '🩺 Salud'}</span></div>
+      <span class="admin-estado" style="color:${estadoColor}">${p.estado}</span>
+    </div>
+    <div class="admin-card-body">
+      <div><label>Correo</label><span>${p.email || '—'}</span></div>
+      <div><label>Teléfono</label><span>${p.telefono || '—'}</span></div>
+      <div><label>Región</label><span>${p.region || '—'}</span></div>
+      <div><label>Especialidad / Área</label><span>${p.especialidad || '—'}</span></div>
+      ${p.reg_super ? `<div><label>Reg. Superintendencia Salud</label><span>${p.reg_super}</span></div>` : ''}
+      ${p.nivel ? `<div><label>Nivel test técnico</label><span>${p.nivel.toUpperCase()} · ${p.test_score}/15</span></div>` : ''}
+    </div>
+    <div class="admin-doc-row">${docs}</div>
+    <div class="admin-actions">${acciones}</div>
+  </div>`;
+}
+
+async function actualizarEstado(id, estado) {
+  const { error } = await supabase.from('profesionales').update({ estado }).eq('id', id);
+  if (error) { alert('Error actualizando: ' + error.message); return; }
+  const item = adminProfesionales.find(p => p.id === id);
+  if (item) item.estado = estado;
+  const activeBtn = document.querySelector('.admin-filters .sf-pill.active');
+  filtrarAdmin(activeBtn ? activeBtn.dataset.estado : 'pendiente');
+  cargarContadores();
+}
+
 function showSendSuccess() {
+
+
   document.getElementById('send-loading').style.display = 'none';
   document.getElementById('send-success-box').style.display = 'block';
 }
@@ -832,12 +1124,16 @@ function irAlTestDesdeModal() { cerrarModalCorreo(); state.tipoReg = 'tech'; goT
 function copiarCorreo() { const email = 'nexo@ejemplo.com'; navigator.clipboard.writeText(email).then(() => { document.getElementById('copy-icon').textContent='✅'; document.getElementById('copy-text').textContent='¡Copiado!'; setTimeout(()=>{ document.getElementById('copy-icon').textContent='📋'; document.getElementById('copy-text').textContent='Copiar correo'; },2200); }).catch(()=>{ const el=document.createElement('textarea'); el.value=email; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); document.getElementById('copy-icon').textContent='✅'; document.getElementById('copy-text').textContent='¡Copiado!'; setTimeout(()=>{ document.getElementById('copy-icon').textContent='📋'; document.getElementById('copy-text').textContent='Copiar correo'; },2200); }); }
 
 // Inicialización de animaciones
-document.querySelectorAll('.page.active').forEach(p => { const ob = new IntersectionObserver((es) => { es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); ob.unobserve(e.target); } }); }, { threshold: 0.1 }); p.querySelectorAll('.fu:not(.vis)').forEach(e => ob.observe(e)); });
+observeFu(document.getElementById('page-home'));
+// Contador real de categorías
+cargarContadores();
+// Acceso al panel de admin vía https://tusitio.cl/#admin
+if (location.hash === '#admin') { goTo('page-admin'); checkAdminSession(); }
 </script>
 
 <!-- Modales -->
 <div class="wa-modal-overlay" id="wa-modal-overlay" onclick="if(event.target===this)closeWaModal()"><div class="wa-modal"><div class="wa-modal-icon">💬</div><h3>Solicitar por WhatsApp</h3><p class="wa-modal-desc">Te conectaremos con un profesional verificado para este servicio. El pago queda retenido hasta que estés conforme.</p><div class="wa-service-pill" id="wa-service-name"></div><p style="font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:20px" id="wa-service-desc"></p><div class="wa-modal-btns"><a id="wa-btn-go" href="#" target="_blank" class="btn-green" style="justify-content:center;text-decoration:none" onclick="closeWaModal()">📱 Abrir WhatsApp →</a><button class="wa-btn-cancel" onclick="closeWaModal()">Cancelar</button></div></div></div>
-<div class="send-overlay" id="send-overlay"><div class="send-box"><div id="send-loading"><div class="send-spinner-big"></div><h3>Enviando tu registro</h3><p>Estamos enviando tus datos al equipo de Nexo para verificación.</p></div><div id="send-success-box" style="display:none"><div class="send-success-icon">✅</div><h3 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--c-green);margin-bottom:10px">🎉 Registro enviado</h3><p>Tus datos y documentos llegaron al equipo de Nexo. Revisaremos tu solicitud en <strong>24–48 horas</strong> y te notificaremos por correo cuando tu perfil esté activo.</p><div style="background:var(--surface2);border-radius:14px;padding:16px;margin-bottom:24px;font-size:.8rem;color:var(--muted)"><div>📧 Notificación enviada al equipo</div><div>📂 Documentos en revisión</div><div>⏳ Activación en 24–48 hrs</div></div><button class="btn-violet" style="width:100%;justify-content:center" onclick="closeSendOverlay()">Entendido →</button></div></div></div>
+<div class="send-overlay" id="send-overlay"><div class="send-box"><div id="send-loading"><div class="send-spinner-big"></div><h3>Enviando tu registro</h3><p id="send-loading-text">Estamos enviando tus datos al equipo de Nexo para verificación.</p></div><div id="send-success-box" style="display:none"><div class="send-success-icon">✅</div><h3 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--c-green);margin-bottom:10px">🎉 Registro enviado</h3><p>Tus datos y documentos llegaron al equipo de Nexo. Revisaremos tu solicitud en <strong>24–48 horas</strong> y te notificaremos por correo cuando tu perfil esté activo.</p><div style="background:var(--surface2);border-radius:14px;padding:16px;margin-bottom:24px;font-size:.8rem;color:var(--muted)"><div>📧 Notificación enviada al equipo</div><div>📂 Documentos en revisión</div><div>⏳ Activación en 24–48 hrs</div></div><button class="btn-violet" style="width:100%;justify-content:center" onclick="closeSendOverlay()">Entendido →</button></div></div></div>
 <div class="inscr-overlay" id="inscr-overlay" onclick="if(event.target===this)cerrarModalCorreo()"><div class="inscr-modal"><button class="inscr-modal-close" onclick="cerrarModalCorreo()">✕</button><div class="inscr-modal-icon" id="inscr-icon">📋</div><h2 id="inscr-titulo">Inscripción profesional</h2><p class="inscr-modal-sub" id="inscr-sub">Envíanos un correo con tu nombre, especialidad y adjunta tu CV o documento de formación.</p><div class="inscr-type-pill" id="inscr-pill">🩺 Profesional de Salud</div><div class="correo-display-box" id="correo-display-box"><div class="correo-label">Escríbenos a</div><div class="correo-address" id="correo-address">nexo@ejemplo.com</div><button class="correo-copy-btn" onclick="copiarCorreo()"><span id="copy-icon">📋</span> <span id="copy-text">Copiar correo</span></button></div><div class="correo-instrucciones"><div class="ci-row"><span class="ci-num">1</span><span>En el <strong>asunto</strong> escribe tu nombre y área</span></div><div class="ci-row"><span class="ci-num">2</span><span>Adjunta tu <strong>CV o certificado de estudios</strong></span></div><div class="ci-row"><span class="ci-num">3</span><span>Cuéntanos brevemente tu <strong>experiencia</strong></span></div><div class="ci-row"><span class="ci-num">4</span><span>Te respondemos en <strong>24–48 horas</strong></span></div></div><div class="inscr-test-aviso" id="inscr-test-aviso">🔒 Debes completar el <strong>test de nivel</strong> (Junior/Mid/Senior) antes de enviar tu inscripción.<button onclick="irAlTestDesdeModal()" style="display:block;width:100%;margin-top:10px;background:var(--c-violet);color:#fff;border:none;border-radius:100px;padding:10px 16px;cursor:pointer">✏️ Ir al test de nivel ahora →</button></div><div class="inscr-test-ok" id="inscr-test-ok"></div><a class="inscr-gmail-btn" id="inscr-gmail-btn" href="#" target="_blank">✉️ Abrir Gmail y enviar correo</a><button class="inscr-modal-cancel" onclick="cerrarModalCorreo()">Cerrar</button></div></div>
 
 </body>
