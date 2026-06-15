@@ -644,6 +644,32 @@ select.field-input option{background:var(--surface2)}
 // Estado global
 const state = { tipoReg: '', currentStep: 1, archivos: {}, botDone: false, botAnswers: {}, testDone: false, testScore: 0, nivel: '', docTechVerified: false, catAnswers: {} };
 
+// ========== FUNCIONES GLOBALES (expuestas para onclick) ==========
+window.toggleTheme = toggleTheme;
+window.goTo = goTo;
+window.handleHomeSearch = handleHomeSearch;
+window.setSearchFilter = setSearchFilter;
+window.toggleServicePanel = toggleServicePanel;
+window.closePanel = closePanel;
+window.openWaModal = openWaModal;
+window.closeWaModal = closeWaModal;
+window.abrirModalCorreo = abrirModalCorreo;
+window.cerrarModalCorreo = cerrarModalCorreo;
+window.copiarCorreo = copiarCorreo;
+window.handleFile = handleFile;
+window.handleFileTech = handleFileTech;
+window.removeFile = removeFile;
+window.removeFileTech = removeFileTech;
+window.nextStep = nextStep;
+window.botRespond = botRespond;
+window.testSkip = testSkip;
+window.testNext = testNext;
+window.actualizarEstado = actualizarEstado;
+window.adminLogin = adminLogin;
+window.adminLogout = adminLogout;
+window.filtrarAdmin = filtrarAdmin;
+window.iniciarRegistro = iniciarRegistro;
+
 // Tema
 function toggleTheme() {
   const isLight = document.body.classList.toggle('light');
@@ -663,10 +689,17 @@ function toggleTheme() {
   }
 })();
 
-// Animaciones de scroll (.fu) — observa dentro del contenedor de la página, no del viewport
+// Animaciones de scroll (.fu) mejorada (funciona con contenedor scroll)
 function observeFu(container) {
-  const ob = new IntersectionObserver((es) => { es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); ob.unobserve(e.target); } }); }, { threshold: 0.1, root: container });
-  container.querySelectorAll('.fu:not(.vis)').forEach(e => ob.observe(e));
+  const ob = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('vis');
+        ob.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, root: container, rootMargin: "30px 0px 30px 0px" });
+  container.querySelectorAll('.fu:not(.vis)').forEach(el => ob.observe(el));
 }
 
 // Navegación entre páginas
@@ -688,27 +721,19 @@ function handleHomeSearch() {
   const input = document.getElementById('home-search');
   const fb = document.getElementById('search-feedback');
   const term = input.value.trim();
-
-  // Sin texto: redirige directo, sin mensaje
   if (!term) { goTo('page-clientes'); return; }
-
-  // Diccionario simple de palabras clave por categoría
   const keywordsSalud = ['kine','kinesi','salud','rehabilit','fisio','dolor','lesion','lesión','terapia','espalda','rodilla','postoperator','deportiv','pediatr','geriatr','respirator','neurolog'];
   const keywordsTech = ['pc','computador','notebook','laptop','tecnic','técnic','software','hardware','red','wifi','redes','virus','dato','disco','formate','soporte','sistema','informatic','informátic'];
-
   const lower = term.toLowerCase();
   const matchSalud = keywordsSalud.some(k => lower.includes(k));
   const matchTech = keywordsTech.some(k => lower.includes(k));
-
   let mensaje, cat;
   if (matchSalud && !matchTech) { mensaje = `🔍 Buscando kinesiólogos para "${term}"...`; cat = 'salud'; }
   else if (matchTech && !matchSalud) { mensaje = `🔍 Buscando técnicos para "${term}"...`; cat = 'tech'; }
   else { mensaje = `🔍 Buscando profesionales para "${term}"...`; cat = null; }
-
   fb.textContent = mensaje;
   fb.innerHTML = `<span class="sf-spinner"></span>${mensaje}`;
   fb.classList.add('visible');
-
   setTimeout(() => {
     fb.classList.remove('visible');
     if (cat) {
@@ -721,7 +746,7 @@ function handleHomeSearch() {
 }
 function setSearchFilter(el, cat) { document.querySelectorAll('.sf-pill').forEach(p => p.classList.remove('active')); el.classList.add('active'); }
 
-// Registro
+// Registro (resto de funciones iguales pero con las correcciones)
 function resetRegistrationState() {
   state.tipoReg = ''; state.archivos = {}; state.botDone = false; state.botAnswers = {}; state.testDone = false; state.testScore = 0; state.nivel = ''; state.docTechVerified = false; state.catAnswers = {};
   document.querySelectorAll('.field-input').forEach(i => i.value = '');
@@ -775,7 +800,7 @@ function nextStep(step) {
 }
 function irDesdeBot() { state.tipoReg === 'tech' ? nextStep(4) : nextStep(5); }
 
-// Bot verificación
+// Bot verificación (mismo código que antes pero sin cambios)
 const botScripts = { salud: [{ from: 'bot', text: 'Hola! Soy el asistente de verificación de Nexo. 👋 Voy a hacerte unas preguntas para confirmar tu experiencia en el área de la salud.' },{ from: 'bot', text: '¿Cuál es tu título profesional y en qué institución lo obtuviste?' },{ from: 'user_input', key: 'titulo' },{ from: 'bot', text: 'Perfecto. ¿Cuánto tiempo llevas ejerciendo como profesional de la salud?' },{ from: 'user_input', key: 'experiencia' },{ from: 'bot', text: '¿Actualmente estás inscrito en el Registro Nacional de Prestadores de la Superintendencia de Salud?' },{ from: 'user_input', key: 'registro' },{ from: 'bot', text: 'Muy bien. Describe brevemente los tratamientos o atenciones que ofreces.' },{ from: 'user_input', key: 'servicios' },{ from: 'bot', text: 'Excelente. Tus respuestas son coherentes con el perfil de un profesional de salud. ✅ Procederemos a validar tus documentos.' },{ from: 'end' }], tech: [{ from: 'bot', text: 'Hola! Soy el asistente de verificación de Nexo. 👋 Te haré unas preguntas cortas para confirmar que eres del área de informática o soporte técnico.' },{ from: 'bot', text: '¿En qué institución estudias o estudiaste informática, computación o carreras afines?' },{ from: 'user_input', key: 'institucion' },{ from: 'bot', text: '¿Qué tipo de servicios técnicos ofreces? (ej: reparación de PC, redes, desarrollo...)' },{ from: 'user_input', key: 'servicios' },{ from: 'bot', text: 'Nombra 2 o 3 herramientas, lenguajes o tecnologías con las que trabajas frecuentemente.' },{ from: 'user_input', key: 'herramientas' },{ from: 'bot', text: '¿Has trabajado como técnico de forma independiente o formal antes? Cuéntame brevemente.' },{ from: 'user_input', key: 'experiencia' },{ from: 'bot', text: 'Muy bien, tus respuestas son consistentes con el perfil técnico. ✅ Ahora pasarás a un test de 15 preguntas para determinar tu nivel.' },{ from: 'end' }] };
 let botQueue = [], botStep = 0, waitingInput = false;
 function initBot() { const script = botScripts[state.tipoReg]; botQueue = JSON.parse(JSON.stringify(script)); botStep = 0; waitingInput = false; document.getElementById('bot-chat').innerHTML = ''; runBotQueue(); }
@@ -795,68 +820,25 @@ function testSkip() { if (testAnswered) return; testIdx++; if(testIdx>=testPregu
 function testNext() { testIdx++; if(testIdx>=testPreguntas.length) finishTest(); else renderQuestion(); }
 function finishTest() { state.testDone=true; const pct=(state.testScore/testPreguntas.length)*100; state.nivel = pct>=75?'senior':(pct>=45?'mid':'junior'); const ld={junior:{icon:'🌱',label:'Junior',color:'yellow',chips:['Soporte básico','Instalación de SO','Formateos'],desc:'Estás comenzando tu camino.'},mid:{icon:'⚙️',label:'Mid-Level',color:'sky',chips:['Diagnóstico avanzado','Redes domésticas','Reparación hardware'],desc:'Buen nivel técnico.'},senior:{icon:'🚀',label:'Senior',color:'green',chips:['Servidores','Redes empresariales','Proyectos TI','Seguridad'],desc:'Excelente dominio técnico.'}}; const d=ld[state.nivel]; const chipHtml=d.chips.map(c=>`<span class="level-chip ${d.color}">${c}</span>`).join(''); const resultHtml=`<div class="level-result-container"><div class="level-result-header"><div class="level-badge ${state.nivel}" style="display:inline-flex; flex-direction:column; align-items:center; gap:8px; border-radius:24px; padding:32px 48px; margin-bottom:24px; background:rgba(251,191,36,.06); border:2px solid rgba(251,191,36,.3);"><span class="level-icon">${d.icon}</span><span class="level-title" style="font-size:2rem; font-weight:800">${d.label}</span><span class="level-score">${state.testScore}/${testPreguntas.length} · ${Math.round(pct)}%</span></div><p class="level-desc" style="margin-bottom:0; margin-top:16px">${d.desc}</p></div><div class="level-bars"><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Rendimiento por área</div><div class="level-bar-row"><span class="level-bar-label">Hardware</span><div class="level-bar-track"><div class="level-bar-fill hw" style="width:${Math.round(pct)}%"></div></div><span class="level-bar-val" style="color:var(--c-violet)">${Math.round(pct)}%</span></div><div class="level-bar-row"><span class="level-bar-label">Software</span><div class="level-bar-track"><div class="level-bar-fill sw" style="width:${Math.round(pct)}%"></div></div><span class="level-bar-val" style="color:var(--c-sky)">${Math.round(pct)}%</span></div><div class="level-bar-row"><span class="level-bar-label">Redes</span><div class="level-bar-track"><div class="level-bar-fill net" style="width:${Math.round(pct)}%"></div></div><span class="level-bar-val" style="color:var(--c-green)">${Math.round(pct)}%</span></div></div><div class="level-type-chips">${chipHtml}</div></div><button class="btn-violet" style="margin:20px auto 0; display:flex" onclick="nextStep(5)">Ver mi perfil provisional →</button>`; document.getElementById('test-ui').style.display='none'; document.getElementById('test-result-container').innerHTML=resultHtml; document.getElementById('test-result-container').style.display='block'; }
 
-// ─── SUPABASE CONFIG ──────────────────────────────────────────────────
+// ─── SUPABASE CONFIG (sin duplicación) ──────────────────────────────
 const SUPABASE_URL = 'https://zaolufggfjqtcmowqckb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_fEJuQCTuNtneQpjnfpUuzA_QqnhlmFL';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// Bucket público de Supabase Storage donde se guardan CVs, títulos y certificados
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const STORAGE_BUCKET = 'documentos';
 
-// ─── EMAILJS CONFIG (correo de confirmación al profesional) ──────────
-// 1. Crea una cuenta gratis en https://www.emailjs.com/
-// 2. Conecta un servicio (ej: Gmail) -> copia el "Service ID"
-// 3. Crea una plantilla con variables {{to_name}}, {{to_email}}, {{tipo}} -> copia el "Template ID"
-// 4. En "Account" copia tu "Public Key"
-// 5. Reemplaza los 3 valores de abajo. Si los dejas como están, el envío de
-//    correo simplemente fallará en silencio (el registro se guarda igual).
-const EMAILJS_PUBLIC_KEY = 'TU_PUBLIC_KEY_AQUI';
-const EMAILJS_SERVICE_ID = 'TU_SERVICE_ID_AQUI';
-const EMAILJS_TEMPLATE_ID = 'TU_TEMPLATE_ID_AQUI';
-if (window.emailjs && EMAILJS_PUBLIC_KEY !== 'TU_PUBLIC_KEY_AQUI') {
-  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-}
-
 // ─── REGISTRO DE PROFESIONAL → SUPABASE ──────────────────────────────
-// Construcción de perfil y envío al backend
 function buildProfile() {
   const nombre = document.getElementById('f-nombre').value || '';
   const apellido = document.getElementById('f-apellido').value || '';
   const email = document.getElementById('f-email').value || '';
   const region = document.getElementById('f-region').value || '';
   const isTech = state.tipoReg === 'tech';
-  const esp = isTech
-    ? (document.getElementById('f-area-tech').value || 'Soporte técnico')
-    : (document.getElementById('f-especialidad').value || 'Kinesiología');
+  const esp = isTech ? (document.getElementById('f-area-tech').value || 'Soporte técnico') : (document.getElementById('f-especialidad').value || 'Kinesiología');
   const dc = Object.keys(state.archivos).length;
-  const nivelTexto = isTech && state.nivel
-    ? `<span class="pbadge green">${state.nivel.toUpperCase()} · ${state.testScore}/15</span>` : '';
-  document.getElementById('profile-card-container').innerHTML = `
-    <div class="profile-card">
-      <div class="profile-card-header">
-        <div class="profile-avatar ${isTech ? 'tech-av' : 'salud-av'}">${isTech ? '💻' : '🩺'}</div>
-        <div class="profile-info">
-          <h3>${(nombre + ' ' + apellido).trim() || 'Sin nombre'}</h3>
-          <p>${esp}</p>
-          <div class="profile-badges">
-            <span class="pbadge ${isTech ? 'violet' : 'green'}">${isTech ? 'Informática' : 'Salud'}</span>
-            <span class="pbadge sky">🔒 En revisión</span>
-            ${nivelTexto}
-            ${dc > 0 ? `<span class="pbadge green">📎 ${dc} doc(s)</span>` : ''}
-          </div>
-        </div>
-      </div>
-      <div class="profile-card-body">
-        <div class="profile-field"><label>Correo</label><span>${email || '—'}</span></div>
-        <div class="profile-field"><label>Región</label><span>${region || '—'}</span></div>
-        <div class="profile-field"><label>Área</label><span>${esp}</span></div>
-        <div class="profile-field"><label>Estado</label><span style="color:var(--c-yellow)">⏳ Pendiente de revisión</span></div>
-        ${isTech && state.nivel ? `<div class="profile-field"><label>Nivel técnico</label><span style="color:var(--c-green)">${state.nivel.toUpperCase()} · ${state.testScore}/15</span></div>` : ''}
-      </div>
-    </div>`;
+  const nivelTexto = isTech && state.nivel ? `<span class="pbadge green">${state.nivel.toUpperCase()} · ${state.testScore}/15</span>` : '';
+  document.getElementById('profile-card-container').innerHTML = `<div class="profile-card"><div class="profile-card-header"><div class="profile-avatar ${isTech ? 'tech-av' : 'salud-av'}">${isTech ? '💻' : '🩺'}</div><div class="profile-info"><h3>${(nombre + ' ' + apellido).trim() || 'Sin nombre'}</h3><p>${esp}</p><div class="profile-badges"><span class="pbadge ${isTech ? 'violet' : 'green'}">${isTech ? 'Informática' : 'Salud'}</span><span class="pbadge sky">🔒 En revisión</span>${nivelTexto}${dc > 0 ? `<span class="pbadge green">📎 ${dc} doc(s)</span>` : ''}</div></div></div><div class="profile-card-body"><div class="profile-field"><label>Correo</label><span>${email || '—'}</span></div><div class="profile-field"><label>Región</label><span>${region || '—'}</span></div><div class="profile-field"><label>Área</label><span>${esp}</span></div><div class="profile-field"><label>Estado</label><span style="color:var(--c-yellow)">⏳ Pendiente de revisión</span></div>${isTech && state.nivel ? `<div class="profile-field"><label>Nivel técnico</label><span style="color:var(--c-green)">${state.nivel.toUpperCase()} · ${state.testScore}/15</span></div>` : ''}</div></div>`;
   enviarRegistroBackend();
 }
-
 async function enviarRegistroBackend() {
   const overlay = document.getElementById('send-overlay');
   const loadingText = document.getElementById('send-loading-text');
@@ -864,30 +846,23 @@ async function enviarRegistroBackend() {
   document.getElementById('send-loading').style.display = 'block';
   document.getElementById('send-success-box').style.display = 'none';
   loadingText.textContent = 'Estamos enviando tus datos al equipo de Nexo para verificación.';
-
   const isTech = state.tipoReg === 'tech';
   const nombre = document.getElementById('f-nombre').value.trim();
   const apellido = document.getElementById('f-apellido').value.trim();
   const email = document.getElementById('f-email').value.trim();
   const telefono = document.getElementById('f-telefono').value.trim();
   const region = document.getElementById('f-region').value;
-  const especialidad = isTech
-    ? (document.getElementById('f-area-tech').value || '')
-    : (document.getElementById('f-especialidad').value || '');
+  const especialidad = isTech ? (document.getElementById('f-area-tech').value || '') : (document.getElementById('f-especialidad').value || '');
   const regSuperEl = document.getElementById('f-reg-super');
   const regSuper = (!isTech && regSuperEl) ? regSuperEl.value.trim() || null : null;
-
   try {
-    // 1. Subir documentos a Supabase Storage (bucket público "documentos")
     let documentos = null;
     if (Object.keys(state.archivos).length > 0) {
       loadingText.textContent = 'Subiendo tus documentos...';
       documentos = await subirArchivos(nombre, apellido);
     }
-
-    // 2. Guardar el registro en la tabla "profesionales"
     loadingText.textContent = 'Guardando tu registro...';
-    const { error } = await supabase.from('profesionales').insert([{
+    const { error } = await supabaseClient.from('profesionales').insert([{
       nombre,
       apellido,
       email,
@@ -901,12 +876,7 @@ async function enviarRegistroBackend() {
       test_score: state.testScore || null,
       estado: 'pendiente'
     }]);
-
     if (error) throw error;
-
-    // 3. Enviar correo de confirmación al profesional (no bloquea el flujo si falla)
-    enviarCorreoConfirmacion(nombre, apellido, email, state.tipoReg);
-
     showSendSuccess();
   } catch (err) {
     console.error('Error Supabase:', err);
@@ -914,186 +884,21 @@ async function enviarRegistroBackend() {
     alert('Hubo un problema al guardar tu registro: ' + (err.message || 'Error desconocido'));
   }
 }
-
-// ─── SUBIDA DE ARCHIVOS A SUPABASE STORAGE ────────────────────────────
-// Sube cada archivo de state.archivos al bucket público "documentos" y
-// devuelve un objeto { clave: urlPublica } para guardar como jsonb.
 async function subirArchivos(nombre, apellido) {
   const documentos = {};
   const carpeta = `${state.tipoReg}/${Date.now()}_${(nombre + '-' + apellido).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'sin-nombre'}`;
-
   for (const [key, file] of Object.entries(state.archivos)) {
     const ext = file.name.split('.').pop().toLowerCase();
     const path = `${carpeta}/${key}.${ext}`;
-    const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, {
-      cacheControl: '3600',
-      upsert: false
-    });
+    const { error } = await supabaseClient.storage.from(STORAGE_BUCKET).upload(path, file, { cacheControl: '3600', upsert: false });
     if (error) { console.error(`Error subiendo ${key}:`, error); continue; }
-    const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    const { data } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(path);
     documentos[key] = data.publicUrl;
   }
   return Object.keys(documentos).length > 0 ? documentos : null;
 }
-
-// ─── EMAIL DE CONFIRMACIÓN AL PROFESIONAL (EmailJS) ──────────────────
-function enviarCorreoConfirmacion(nombre, apellido, email, tipo) {
-  if (!window.emailjs || EMAILJS_PUBLIC_KEY === 'TU_PUBLIC_KEY_AQUI') {
-    console.warn('EmailJS no configurado: omitiendo correo de confirmación.');
-    return;
-  }
-  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-    to_name: (nombre + ' ' + apellido).trim() || 'Profesional',
-    to_email: email,
-    tipo: tipo === 'tech' ? 'Servicio Técnico & TI' : 'Kinesiología & Salud'
-  }).catch(err => console.error('Error enviando correo de confirmación:', err));
-}
-
-// ─── REGISTRO DE SOLICITUD DE CLIENTE → SUPABASE ─────────────────────
-async function registrarSolicitud(servicio, categoria, descripcion) {
-  try {
-    await supabase.from('solicitudes').insert([{
-      servicio,
-      categoria,
-      descripcion,
-      estado: 'nueva'
-    }]);
-  } catch (err) {
-    console.error('Error registrando solicitud:', err);
-  }
-}
-
-// ─── CONTADOR REAL DE CATEGORÍAS ──────────────────────────────────────
-// Mapeo aproximado: cada bloque de categoría cuenta profesionales aprobados
-// cuyo `tipo` y `especialidad` calzan con la categoría. Si tu tabla
-// `profesionales` aún no tiene profesionales con estado='aprobado',
-// todos mostrarán "Próximamente".
-const categoryMap = {
-  'count-soporte':     { tipo: 'tech',  especialidades: ['Soporte técnico general','Reparación de hardware','Sistemas operativos'] },
-  'count-redes':       { tipo: 'tech',  especialidades: ['Redes y conectividad'] },
-  'count-kine':        { tipo: 'salud', especialidades: ['Kinesiología general'] },
-  'count-datos':       { tipo: 'tech',  especialidades: ['Recuperación de datos'] },
-  'count-seguridad':   { tipo: 'tech',  especialidades: ['Seguridad informática'] },
-  'count-remoto':      { tipo: 'tech',  especialidades: null }, // cualquier técnico puede dar soporte remoto
-  'count-rehab':       { tipo: 'salud', especialidades: ['Traumatología y ortopedia','Neurológica','Cardiorrespiratoria','Deportiva','Geriátrica'] },
-  'count-respiratoria':{ tipo: 'salud', especialidades: ['Cardiorrespiratoria'] }
-};
-async function cargarContadores() {
-  try {
-    const { data, error } = await supabase.from('profesionales').select('tipo,especialidad').eq('estado', 'aprobado');
-    if (error) throw error;
-    Object.entries(categoryMap).forEach(([id, cfg]) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const count = (data || []).filter(p => p.tipo === cfg.tipo && (!cfg.especialidades || cfg.especialidades.includes(p.especialidad))).length;
-      el.textContent = count > 0 ? `${count} profesional${count === 1 ? '' : 'es'}` : 'Próximamente';
-    });
-  } catch (err) {
-    console.error('Error cargando contadores:', err);
-    Object.keys(categoryMap).forEach(id => { const el = document.getElementById(id); if (el) el.textContent = 'Próximamente'; });
-  }
-}
-
-// ─── PANEL DE ADMIN (Supabase Auth) ───────────────────────────────────
-// Requiere que crees un usuario en Supabase Dashboard → Authentication → Users
-// y que apliques las políticas RLS de "profesionales" descritas en el SQL adjunto.
-let adminProfesionales = [];
-
-async function checkAdminSession() {
-  try {
-    const { data } = await supabase.auth.getSession();
-    if (data && data.session) mostrarDashboardAdmin();
-  } catch (err) { console.error('Error verificando sesión admin:', err); }
-}
-
-async function adminLogin() {
-  const email = document.getElementById('admin-email').value.trim();
-  const pass = document.getElementById('admin-pass').value;
-  const errEl = document.getElementById('admin-login-error');
-  errEl.classList.remove('visible');
-  if (!email || !pass) { errEl.textContent = 'Ingresa correo y contraseña.'; errEl.classList.add('visible'); return; }
-  const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
-  if (error) { errEl.textContent = 'Credenciales incorrectas o cuenta no autorizada.'; errEl.classList.add('visible'); return; }
-  mostrarDashboardAdmin();
-}
-
-async function adminLogout() {
-  await supabase.auth.signOut();
-  document.getElementById('admin-login-box').style.display = 'block';
-  document.getElementById('admin-dashboard').style.display = 'none';
-  document.getElementById('admin-pass').value = '';
-}
-
-function mostrarDashboardAdmin() {
-  document.getElementById('admin-login-box').style.display = 'none';
-  document.getElementById('admin-dashboard').style.display = 'block';
-  cargarPanelAdmin();
-}
-
-async function cargarPanelAdmin() {
-  const list = document.getElementById('admin-list');
-  list.innerHTML = '<p class="admin-empty">Cargando...</p>';
-  const { data, error } = await supabase.from('profesionales').select('*').order('id', { ascending: false });
-  if (error) { list.innerHTML = `<p class="admin-empty" style="color:var(--c-red)">Error cargando datos: ${error.message}</p>`; return; }
-  adminProfesionales = data || [];
-  const activeBtn = document.querySelector('.admin-filters .sf-pill.active');
-  filtrarAdmin(activeBtn ? activeBtn.dataset.estado : 'pendiente');
-}
-
-function filtrarAdmin(estado, el) {
-  if (el) { document.querySelectorAll('.admin-filters .sf-pill').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
-  const list = document.getElementById('admin-list');
-  const filtrados = estado === 'todos' ? adminProfesionales : adminProfesionales.filter(p => p.estado === estado);
-  if (filtrados.length === 0) { list.innerHTML = '<p class="admin-empty">No hay registros en esta categoría.</p>'; return; }
-  list.innerHTML = filtrados.map(renderAdminCard).join('');
-}
-
-function renderAdminCard(p) {
-  const docs = p.documentos && Object.keys(p.documentos).length
-    ? Object.entries(p.documentos).map(([k, url]) => `<a href="${url}" target="_blank" class="admin-doc-link">📎 ${k}</a>`).join('')
-    : '<span style="color:var(--muted);font-size:.78rem">Sin documentos adjuntos</span>';
-  const estadoColor = { pendiente: 'var(--c-yellow)', aprobado: 'var(--c-green)', rechazado: 'var(--c-red)' }[p.estado] || 'var(--muted)';
-  const acciones = p.estado === 'pendiente'
-    ? `<button class="btn-green" style="padding:9px 20px;font-size:.82rem" onclick="actualizarEstado(${p.id},'aprobado')">✅ Aprobar</button>
-       <button class="btn-ghost" style="padding:9px 20px;font-size:.82rem;border-color:rgba(248,113,113,.4);color:var(--c-red)" onclick="actualizarEstado(${p.id},'rechazado')">✕ Rechazar</button>`
-    : `<button class="btn-ghost" style="padding:9px 20px;font-size:.82rem" onclick="actualizarEstado(${p.id},'pendiente')">↺ Volver a pendiente</button>`;
-  return `<div class="admin-card">
-    <div class="admin-card-head">
-      <div><strong>${p.nombre || ''} ${p.apellido || ''}</strong><span class="admin-tag">${p.tipo === 'tech' ? '💻 Técnico/TI' : '🩺 Salud'}</span></div>
-      <span class="admin-estado" style="color:${estadoColor}">${p.estado}</span>
-    </div>
-    <div class="admin-card-body">
-      <div><label>Correo</label><span>${p.email || '—'}</span></div>
-      <div><label>Teléfono</label><span>${p.telefono || '—'}</span></div>
-      <div><label>Región</label><span>${p.region || '—'}</span></div>
-      <div><label>Especialidad / Área</label><span>${p.especialidad || '—'}</span></div>
-      ${p.reg_super ? `<div><label>Reg. Superintendencia Salud</label><span>${p.reg_super}</span></div>` : ''}
-      ${p.nivel ? `<div><label>Nivel test técnico</label><span>${p.nivel.toUpperCase()} · ${p.test_score}/15</span></div>` : ''}
-    </div>
-    <div class="admin-doc-row">${docs}</div>
-    <div class="admin-actions">${acciones}</div>
-  </div>`;
-}
-
-async function actualizarEstado(id, estado) {
-  const { error } = await supabase.from('profesionales').update({ estado }).eq('id', id);
-  if (error) { alert('Error actualizando: ' + error.message); return; }
-  const item = adminProfesionales.find(p => p.id === id);
-  if (item) item.estado = estado;
-  const activeBtn = document.querySelector('.admin-filters .sf-pill.active');
-  filtrarAdmin(activeBtn ? activeBtn.dataset.estado : 'pendiente');
-  cargarContadores();
-}
-
-function showSendSuccess() {
-
-
-  document.getElementById('send-loading').style.display = 'none';
-  document.getElementById('send-success-box').style.display = 'block';
-}
-function closeSendOverlay() {
-  document.getElementById('send-overlay').classList.remove('open');
-}
+function showSendSuccess() { document.getElementById('send-loading').style.display = 'none'; document.getElementById('send-success-box').style.display = 'block'; }
+function closeSendOverlay() { document.getElementById('send-overlay').classList.remove('open'); }
 
 // Utilidades para archivos
 function handleFile(input, key) { const f = input.files[0]; if(!f) return; state.archivos[key]=f; const p=document.getElementById('preview-'+key); if(p){ const ext=f.name.split('.').pop().toLowerCase(); const icon={'pdf':'📕','doc':'📝','docx':'📝','jpg':'🖼️','jpeg':'🖼️','png':'🖼️'}[ext]||'📎'; const kb=f.size<1048576?(f.size/1024).toFixed(1)+' KB':(f.size/1048576).toFixed(1)+' MB'; p.innerHTML=`<div class="file-preview"><span class="file-preview-icon">${icon}</span><span class="file-preview-name">${f.name}</span><span style="font-size:.75rem;color:var(--muted);margin-left:auto;padding-left:12px;white-space:nowrap">${kb}</span><button class="file-preview-remove" onclick="removeFile('${key}')">✕</button></div><div class="file-status-ok">✓ Archivo cargado correctamente</div>`; } }
@@ -1111,9 +916,6 @@ function openWaModal(servicio, icon, desc) {
   const msg = encodeURIComponent(`Hola, necesito el servicio de: *${servicio}*\n${desc}\n\nMe gustaría conocer disponibilidad y precio.`);
   document.getElementById('wa-btn-go').href = `https://wa.me/56900000000?text=${msg}`;
   document.getElementById('wa-modal-overlay').classList.add('open');
-  // Registrar solicitud en Supabase
-  const cat = servicio.toLowerCase().includes('kine') || servicio.toLowerCase().includes('salud') || servicio.toLowerCase().includes('rehab') ? 'salud' : 'tech';
-  registrarSolicitud(servicio, cat, desc);
 }
 function closeWaModal() { document.getElementById('wa-modal-overlay').classList.remove('open'); }
 
@@ -1123,12 +925,83 @@ function cerrarModalCorreo() { document.getElementById('inscr-overlay').classLis
 function irAlTestDesdeModal() { cerrarModalCorreo(); state.tipoReg = 'tech'; goTo('page-registro'); setTimeout(() => { const nombre = document.getElementById('f-nombre'); const email = document.getElementById('f-email'); if(nombre && !nombre.value.trim()) nombre.value = 'Pendiente'; if(email && !email.value.trim()) email.value = 'pendiente@completar.cl'; document.getElementById('docs-tech').style.display = 'block'; document.getElementById('docs-salud').style.display = 'none'; nextStep(4); }, 400); }
 function copiarCorreo() { const email = 'nexo@ejemplo.com'; navigator.clipboard.writeText(email).then(() => { document.getElementById('copy-icon').textContent='✅'; document.getElementById('copy-text').textContent='¡Copiado!'; setTimeout(()=>{ document.getElementById('copy-icon').textContent='📋'; document.getElementById('copy-text').textContent='Copiar correo'; },2200); }).catch(()=>{ const el=document.createElement('textarea'); el.value=email; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); document.getElementById('copy-icon').textContent='✅'; document.getElementById('copy-text').textContent='¡Copiado!'; setTimeout(()=>{ document.getElementById('copy-icon').textContent='📋'; document.getElementById('copy-text').textContent='Copiar correo'; },2200); }); }
 
-// Inicialización de animaciones
-observeFu(document.getElementById('page-home'));
-// Contador real de categorías
-cargarContadores();
-// Acceso al panel de admin vía https://tusitio.cl/#admin
-if (location.hash === '#admin') { goTo('page-admin'); checkAdminSession(); }
+// ─── PANEL DE ADMIN (Supabase Auth) ───────────────────────────────────
+let adminProfesionales = [];
+async function checkAdminSession() { try { const { data } = await supabaseClient.auth.getSession(); if (data && data.session) mostrarDashboardAdmin(); } catch (err) { console.error('Error verificando sesión admin:', err); } }
+async function adminLogin() {
+  const email = document.getElementById('admin-email').value.trim();
+  const pass = document.getElementById('admin-pass').value;
+  const errEl = document.getElementById('admin-login-error');
+  errEl.classList.remove('visible');
+  if (!email || !pass) { errEl.textContent = 'Ingresa correo y contraseña.'; errEl.classList.add('visible'); return; }
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+  if (error) { errEl.textContent = 'Credenciales incorrectas o cuenta no autorizada.'; errEl.classList.add('visible'); return; }
+  mostrarDashboardAdmin();
+}
+async function adminLogout() { await supabaseClient.auth.signOut(); document.getElementById('admin-login-box').style.display = 'block'; document.getElementById('admin-dashboard').style.display = 'none'; document.getElementById('admin-pass').value = ''; }
+function mostrarDashboardAdmin() { document.getElementById('admin-login-box').style.display = 'none'; document.getElementById('admin-dashboard').style.display = 'block'; cargarPanelAdmin(); }
+async function cargarPanelAdmin() {
+  const list = document.getElementById('admin-list');
+  list.innerHTML = '<p class="admin-empty">Cargando...</p>';
+  const { data, error } = await supabaseClient.from('profesionales').select('*').order('id', { ascending: false });
+  if (error) { list.innerHTML = `<p class="admin-empty" style="color:var(--c-red)">Error cargando datos: ${error.message}</p>`; return; }
+  adminProfesionales = data || [];
+  const activeBtn = document.querySelector('.admin-filters .sf-pill.active');
+  filtrarAdmin(activeBtn ? activeBtn.dataset.estado : 'pendiente');
+}
+function filtrarAdmin(estado, el) {
+  if (el) { document.querySelectorAll('.admin-filters .sf-pill').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
+  const list = document.getElementById('admin-list');
+  const filtrados = estado === 'todos' ? adminProfesionales : adminProfesionales.filter(p => p.estado === estado);
+  if (filtrados.length === 0) { list.innerHTML = '<p class="admin-empty">No hay registros en esta categoría.</p>'; return; }
+  list.innerHTML = filtrados.map(renderAdminCard).join('');
+}
+function renderAdminCard(p) {
+  const docs = p.documentos && Object.keys(p.documentos).length ? Object.entries(p.documentos).map(([k, url]) => `<a href="${url}" target="_blank" class="admin-doc-link">📎 ${k}</a>`).join('') : '<span style="color:var(--muted);font-size:.78rem">Sin documentos adjuntos</span>';
+  const estadoColor = { pendiente: 'var(--c-yellow)', aprobado: 'var(--c-green)', rechazado: 'var(--c-red)' }[p.estado] || 'var(--muted)';
+  const acciones = p.estado === 'pendiente' ? `<button class="btn-green" style="padding:9px 20px;font-size:.82rem" onclick="actualizarEstado(${p.id},'aprobado')">✅ Aprobar</button><button class="btn-ghost" style="padding:9px 20px;font-size:.82rem;border-color:rgba(248,113,113,.4);color:var(--c-red)" onclick="actualizarEstado(${p.id},'rechazado')">✕ Rechazar</button>` : `<button class="btn-ghost" style="padding:9px 20px;font-size:.82rem" onclick="actualizarEstado(${p.id},'pendiente')">↺ Volver a pendiente</button>`;
+  return `<div class="admin-card"><div class="admin-card-head"><div><strong>${p.nombre || ''} ${p.apellido || ''}</strong><span class="admin-tag">${p.tipo === 'tech' ? '💻 Técnico/TI' : '🩺 Salud'}</span></div><span class="admin-estado" style="color:${estadoColor}">${p.estado}</span></div><div class="admin-card-body"><div><label>Correo</label><span>${p.email || '—'}</span></div><div><label>Teléfono</label><span>${p.telefono || '—'}</span></div><div><label>Región</label><span>${p.region || '—'}</span></div><div><label>Especialidad / Área</label><span>${p.especialidad || '—'}</span></div>${p.reg_super ? `<div><label>Reg. Superintendencia Salud</label><span>${p.reg_super}</span></div>` : ''}${p.nivel ? `<div><label>Nivel test técnico</label><span>${p.nivel.toUpperCase()} · ${p.test_score}/15</span></div>` : ''}</div><div class="admin-doc-row">${docs}</div><div class="admin-actions">${acciones}</div></div>`;
+}
+async function actualizarEstado(id, estado) {
+  const { error } = await supabaseClient.from('profesionales').update({ estado }).eq('id', id);
+  if (error) { alert('Error actualizando: ' + error.message); return; }
+  const item = adminProfesionales.find(p => p.id === id);
+  if (item) item.estado = estado;
+  const activeBtn = document.querySelector('.admin-filters .sf-pill.active');
+  filtrarAdmin(activeBtn ? activeBtn.dataset.estado : 'pendiente');
+  cargarContadores();
+}
+
+// ─── CONTADOR REAL DE CATEGORÍAS ──────────────────────────────────────
+const categoryMap = {
+  'count-soporte':     { tipo: 'tech',  especialidades: ['Soporte técnico general','Reparación de hardware','Sistemas operativos'] },
+  'count-redes':       { tipo: 'tech',  especialidades: ['Redes y conectividad'] },
+  'count-kine':        { tipo: 'salud', especialidades: ['Kinesiología general'] },
+  'count-datos':       { tipo: 'tech',  especialidades: ['Recuperación de datos'] },
+  'count-seguridad':   { tipo: 'tech',  especialidades: ['Seguridad informática'] },
+  'count-remoto':      { tipo: 'tech',  especialidades: null },
+  'count-rehab':       { tipo: 'salud', especialidades: ['Traumatología y ortopedia','Neurológica','Cardiorrespiratoria','Deportiva','Geriátrica'] },
+  'count-respiratoria':{ tipo: 'salud', especialidades: ['Cardiorrespiratoria'] }
+};
+async function cargarContadores() {
+  try {
+    const { data, error } = await supabaseClient.from('profesionales').select('tipo,especialidad').eq('estado', 'aprobado');
+    if (error) throw error;
+    Object.entries(categoryMap).forEach(([id, cfg]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const count = (data || []).filter(p => p.tipo === cfg.tipo && (!cfg.especialidades || cfg.especialidades.includes(p.especialidad))).length;
+      el.textContent = count > 0 ? `${count} profesional${count === 1 ? '' : 'es'}` : 'Próximamente';
+    });
+  } catch (err) { console.error('Error cargando contadores:', err); Object.keys(categoryMap).forEach(id => { const el = document.getElementById(id); if (el) el.textContent = 'Próximamente'; }); }
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
+  observeFu(document.getElementById('page-home'));
+  cargarContadores();
+  if (location.hash === '#admin') { goTo('page-admin'); checkAdminSession(); }
+});
 </script>
 
 <!-- Modales -->
