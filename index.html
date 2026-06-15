@@ -546,7 +546,7 @@ select.field-input option{background:var(--surface2)}
   </div></div>
 </div>
 
-<!-- ================= PAGE CLIENTES (con botón de pago de prueba) ================= -->
+<!-- ================= PAGE CLIENTES (con simulación de pago) ================= -->
 <div class="page" id="page-clientes">
   <div class="client-blobs"><div class="blob"></div><div class="blob"></div></div>
   <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo" onclick="window.goTo('page-home')" style="cursor:pointer">Nexo</div><div style="display:flex;gap:8px;align-items:center"><button class="theme-btn" onclick="window.toggleTheme()" aria-label="Cambiar tema">🌓</button><button class="nav-back" onclick="window.goTo('page-home')"><span>&larr;</span> Volver al inicio</button></div></div></nav>
@@ -568,11 +568,11 @@ select.field-input option{background:var(--surface2)}
         <div class="service-item" onclick="window.openWaModal('Formateo y limpieza de PC','🧹','Formateo completo, reinstalación del sistema, limpieza física')"><span class="si-icon">🧹</span><div class="si-info"><h5>Formateo y limpieza de PC</h5><span>Formateo completo, reinstalación del sistema, limpieza física</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div>
         <div class="service-item" onclick="window.openWaModal('Seguridad y eliminación de virus','🛡️','Limpieza de malware, spyware, configuración de firewall')"><span class="si-icon">🛡️</span><div class="si-info"><h5>Seguridad y eliminación de virus</h5><span>Limpieza de malware, spyware, configuración de firewall</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div>
         <div class="service-item" onclick="window.openWaModal('Soporte remoto','🖥️','Asistencia online sin salir de casa, solución rápida')"><span class="si-icon">🖥️</span><div class="si-info"><h5>Soporte remoto</h5><span>Asistencia online sin salir de casa, solución rápida</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div>
-        <!-- Botón de pago de prueba para Tech -->
-        <div class="service-item" style="justify-content:center; margin-top:8px; border-top:1px solid var(--border)" onclick="window.pagarConWebpayPrueba('Reparación de PC', 5000)">
+        <!-- Botón simular pago -->
+        <div class="service-item" style="justify-content:center; margin-top:8px; border-top:1px solid var(--border)" onclick="window.simularPago('Reparación de PC', 5000, 'tech')">
           <span class="si-icon">💳</span>
-          <div class="si-info"><h5>Pagar este servicio con Webpay (Prueba)</h5><span>Simula el pago de $5.000 CLP en el entorno de pruebas de Transbank</span></div>
-          <span class="si-badge" style="background:rgba(157,127,245,.2); color:var(--c-violet)">Sandbox</span>
+          <div class="si-info"><h5>Simular Pago (Escrow)</h5><span>Prueba el flujo completo de pago retenido y liberación</span></div>
+          <span class="si-badge" style="background:rgba(94,245,176,.2); color:var(--c-green)">Simulación</span>
           <span class="si-arrow">→</span>
         </div>
       </div>
@@ -584,11 +584,11 @@ select.field-input option{background:var(--surface2)}
         <div class="service-item" onclick="window.openWaModal('Kinesiología respiratoria','🫁','Fisioterapia respiratoria, EPOC, asma, post-COVID')"><span class="si-icon">🫁</span><div class="si-info"><h5>Kinesiología respiratoria</h5><span>EPOC, asma, recuperación post-COVID</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div>
         <div class="service-item" onclick="window.openWaModal('Kinesioterapia pediátrica','👶','Atención kinesiología para niños y bebés')"><span class="si-icon">👶</span><div class="si-info"><h5>Kinesioterapia pediátrica</h5><span>Atención especializada para niños y bebés</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div>
         <div class="service-item" onclick="window.openWaModal('Kinesiología geriátrica','🧓','Adulto mayor, movilidad, equilibrio y calidad de vida')"><span class="si-icon">🧓</span><div class="si-info"><h5>Kinesiología geriátrica</h5><span>Adulto mayor, movilidad, equilibrio y calidad de vida</span></div><span class="si-badge">Disponible</span><span class="si-arrow">→</span></div>
-        <!-- Botón de pago de prueba para Salud -->
-        <div class="service-item" style="justify-content:center; margin-top:8px; border-top:1px solid var(--border)" onclick="window.pagarConWebpayPrueba('Kinesiología a domicilio', 7500)">
+        <!-- Botón simular pago -->
+        <div class="service-item" style="justify-content:center; margin-top:8px; border-top:1px solid var(--border)" onclick="window.simularPago('Kinesiología a domicilio', 7500, 'salud')">
           <span class="si-icon">💳</span>
-          <div class="si-info"><h5>Pagar este servicio con Webpay (Prueba)</h5><span>Simula el pago de $7.500 CLP en el entorno de pruebas de Transbank</span></div>
-          <span class="si-badge" style="background:rgba(157,127,245,.2); color:var(--c-violet)">Sandbox</span>
+          <div class="si-info"><h5>Simular Pago (Escrow)</h5><span>Prueba el flujo completo de pago retenido y liberación</span></div>
+          <span class="si-badge" style="background:rgba(94,245,176,.2); color:var(--c-green)">Simulación</span>
           <span class="si-arrow">→</span>
         </div>
       </div>
@@ -662,7 +662,7 @@ select.field-input option{background:var(--surface2)}
   if (window.__nexoLoaded) return;
   window.__nexoLoaded = true;
 
-  // Configuración Supabase (única instancia)
+  // Configuración Supabase
   const SUPABASE_URL = 'https://zaolufggfjqtcmowqckb.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_fEJuQCTuNtneQpjnfpUuzA_QqnhlmFL';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -797,14 +797,68 @@ select.field-input option{background:var(--surface2)}
     document.getElementById('wa-modal-overlay').classList.remove('open');
   };
 
-  // ========== WEBPAY SANDBOX (PRUEBAS GRATUITAS) ==========
-  window.pagarConWebpayPrueba = function(servicio, montoCLP) {
-    alert("🔧 Modo de pruebas: Redirigiendo a entorno sandbox de Transbank.\n\nMonto: $" + montoCLP + " CLP\nServicio: " + servicio + "\n\nUsa tarjeta de prueba:\nNúmero: 4051 8861 0000 6115\nCVV: 123\nFecha venc: cualquier fecha futura");
-    // Redirige a la página de demostración de Transbank (simulada)
-    window.open('https://webpay3gint.transbank.cl/webpayserver/initTransaction', '_blank');
+  // ========== SIMULACIÓN DE PAGO (ESCROW) ==========
+  window.simularPago = async function(servicio, monto, categoria) {
+    // Modal para pedir datos del cliente (simulación)
+    const clienteNombre = prompt("Simulación de pago\nIngresa tu nombre (para la solicitud):");
+    if (!clienteNombre) return;
+    const clienteEmail = prompt("Ingresa tu correo electrónico:");
+    if (!clienteEmail) return;
+    const clienteTelefono = prompt("Ingresa tu teléfono:");
+    
+    // Crear solicitud en Supabase con estado "pendiente_pago"
+    const { data: solicitud, error: errSol } = await supabaseClient.from('solicitudes').insert({
+      servicio: servicio,
+      categoria: categoria,
+      descripcion: `Servicio: ${servicio}. Monto simulado: $${monto} CLP`,
+      monto: monto,
+      estado: 'pendiente_pago',
+      cliente_nombre: clienteNombre,
+      cliente_email: clienteEmail,
+      cliente_telefono: clienteTelefono
+    }).select().single();
+    
+    if (errSol) {
+      alert("Error al crear la solicitud: " + errSol.message);
+      return;
+    }
+    
+    // Crear pago simulado en estado "retenido"
+    const comision = 2000;
+    const montoProfesional = monto - comision;
+    const { error: errPago } = await supabaseClient.from('pagos').insert({
+      solicitud_id: solicitud.id,
+      monto: monto,
+      comision: comision,
+      monto_profesional: montoProfesional,
+      estado: 'retenido'
+    });
+    
+    if (errPago) {
+      alert("Error al crear el pago: " + errPago.message);
+      return;
+    }
+    
+    // Mostrar mensaje y opción de liberar pago
+    if (confirm(`✅ Solicitud #${solicitud.id} creada.\nMonto: $${monto} CLP (retenido en garantía).\nComisión Nexo: $${comision}\nAl profesional le corresponden: $${montoProfesional}\n\n¿Deseas marcar el servicio como completado y liberar el pago?`)) {
+      // Actualizar solicitud a "completado"
+      await supabaseClient.from('solicitudes').update({ estado: 'completado' }).eq('id', solicitud.id);
+      // Liberar pago
+      await supabaseClient.from('pagos').update({ estado: 'liberado' }).eq('solicitud_id', solicitud.id);
+      alert(`¡Pago liberado! El profesional ha recibido $${montoProfesional} CLP (simulado).`);
+    } else {
+      alert("El pago sigue retenido. Puedes liberarlo más tarde desde el panel de administración.");
+    }
   };
 
-  // ========== FUNCIONES DE REGISTRO (resumidas pero funcionales) ==========
+  // ========== REGISTRO DE SOLICITUD DE CLIENTE (WhatsApp) ==========
+  async function registrarSolicitud(servicio, categoria, descripcion) {
+    try {
+      await supabaseClient.from('solicitudes').insert([{ servicio, categoria, descripcion, estado: 'nueva' }]);
+    } catch (err) { console.error('Error registrando solicitud:', err); }
+  }
+
+  // ========== FUNCIONES DE REGISTRO (abreviadas pero completas) ==========
   window.handleFile = function(input, key) {
     const f = input.files[0]; if(!f) return;
     state.archivos[key]=f;
@@ -865,7 +919,6 @@ select.field-input option{background:var(--surface2)}
     state.docTechVerified=false;
   };
   
-  // Registro steps
   window.nextStep = function(step) {
     if (step === 2 && !validateStep1()) return;
     if (step === 3) setTimeout(() => initBot(), 100);
@@ -929,35 +982,8 @@ select.field-input option{background:var(--surface2)}
     const scanBox = document.getElementById('scan-box-tech'); if (scanBox) scanBox.classList.remove('visible');
   }
   
-  // Bot de verificación (simplificado pero funcional)
-  const botScripts = {
-    salud: [
-      { from: 'bot', text: 'Hola! Soy el asistente de verificación de Nexo. 👋 Voy a hacerte unas preguntas para confirmar tu experiencia en el área de la salud.' },
-      { from: 'bot', text: '¿Cuál es tu título profesional y en qué institución lo obtuviste?' },
-      { from: 'user_input', key: 'titulo' },
-      { from: 'bot', text: 'Perfecto. ¿Cuánto tiempo llevas ejerciendo como profesional de la salud?' },
-      { from: 'user_input', key: 'experiencia' },
-      { from: 'bot', text: '¿Actualmente estás inscrito en el Registro Nacional de Prestadores de la Superintendencia de Salud?' },
-      { from: 'user_input', key: 'registro' },
-      { from: 'bot', text: 'Muy bien. Describe brevemente los tratamientos o atenciones que ofreces.' },
-      { from: 'user_input', key: 'servicios' },
-      { from: 'bot', text: 'Excelente. Tus respuestas son coherentes con el perfil de un profesional de salud. ✅ Procederemos a validar tus documentos.' },
-      { from: 'end' }
-    ],
-    tech: [
-      { from: 'bot', text: 'Hola! Soy el asistente de verificación de Nexo. 👋 Te haré unas preguntas cortas para confirmar que eres del área de informática o soporte técnico.' },
-      { from: 'bot', text: '¿En qué institución estudias o estudiaste informática, computación o carreras afines?' },
-      { from: 'user_input', key: 'institucion' },
-      { from: 'bot', text: '¿Qué tipo de servicios técnicos ofreces? (ej: reparación de PC, redes, desarrollo...)' },
-      { from: 'user_input', key: 'servicios' },
-      { from: 'bot', text: 'Nombra 2 o 3 herramientas, lenguajes o tecnologías con las que trabajas frecuentemente.' },
-      { from: 'user_input', key: 'herramientas' },
-      { from: 'bot', text: '¿Has trabajado como técnico de forma independiente o formal antes? Cuéntame brevemente.' },
-      { from: 'user_input', key: 'experiencia' },
-      { from: 'bot', text: 'Muy bien, tus respuestas son consistentes con el perfil técnico. ✅ Ahora pasarás a un test de 15 preguntas para determinar tu nivel.' },
-      { from: 'end' }
-    ]
-  };
+  // Bot de verificación
+  const botScripts = { salud: [ { from: 'bot', text: 'Hola! Soy el asistente de verificación de Nexo. 👋 Voy a hacerte unas preguntas para confirmar tu experiencia en el área de la salud.' }, { from: 'bot', text: '¿Cuál es tu título profesional y en qué institución lo obtuviste?' }, { from: 'user_input', key: 'titulo' }, { from: 'bot', text: 'Perfecto. ¿Cuánto tiempo llevas ejerciendo como profesional de la salud?' }, { from: 'user_input', key: 'experiencia' }, { from: 'bot', text: '¿Actualmente estás inscrito en el Registro Nacional de Prestadores de la Superintendencia de Salud?' }, { from: 'user_input', key: 'registro' }, { from: 'bot', text: 'Muy bien. Describe brevemente los tratamientos o atenciones que ofreces.' }, { from: 'user_input', key: 'servicios' }, { from: 'bot', text: 'Excelente. Tus respuestas son coherentes con el perfil de un profesional de salud. ✅ Procederemos a validar tus documentos.' }, { from: 'end' } ], tech: [ { from: 'bot', text: 'Hola! Soy el asistente de verificación de Nexo. 👋 Te haré unas preguntas cortas para confirmar que eres del área de informática o soporte técnico.' }, { from: 'bot', text: '¿En qué institución estudias o estudiaste informática, computación o carreras afines?' }, { from: 'user_input', key: 'institucion' }, { from: 'bot', text: '¿Qué tipo de servicios técnicos ofreces? (ej: reparación de PC, redes, desarrollo...)' }, { from: 'user_input', key: 'servicios' }, { from: 'bot', text: 'Nombra 2 o 3 herramientas, lenguajes o tecnologías con las que trabajas frecuentemente.' }, { from: 'user_input', key: 'herramientas' }, { from: 'bot', text: '¿Has trabajado como técnico de forma independiente o formal antes? Cuéntame brevemente.' }, { from: 'user_input', key: 'experiencia' }, { from: 'bot', text: 'Muy bien, tus respuestas son consistentes con el perfil técnico. ✅ Ahora pasarás a un test de 15 preguntas para determinar tu nivel.' }, { from: 'end' } ] };
   let botQueue = [], botStep = 0, waitingInput = false;
   
   function initBot() {
@@ -1029,11 +1055,9 @@ select.field-input option{background:var(--surface2)}
     setTimeout(() => { d.remove(); cb(); }, 900);
   }
   
-  window.irDesdeBot = function() {
-    state.tipoReg === 'tech' ? window.nextStep(4) : window.nextStep(5);
-  };
+  window.irDesdeBot = function() { state.tipoReg === 'tech' ? window.nextStep(4) : window.nextStep(5); };
   
-  // Test de nivel (simplificado pero funcional)
+  // Test de nivel
   const testPreguntas = [
     { cat: 'Hardware', q: '¿Qué significa la sigla RAM en computación?', opts: ['Read Access Memory','Random Access Memory','Rapid Access Module','Read And Memory'], ans: 1 },
     { cat: 'Hardware', q: '¿Qué tipo de almacenamiento es más rápido en condiciones normales?', opts: ['HDD','DVD-ROM','SSD NVMe M.2','USB 3.0'], ans: 2 },
@@ -1110,9 +1134,7 @@ select.field-input option{background:var(--surface2)}
     state.testDone=true;
     const pct=(state.testScore/testPreguntas.length)*100;
     state.nivel = pct>=75?'senior':(pct>=45?'mid':'junior');
-    const ld={junior:{icon:'🌱',label:'Junior',color:'yellow',chips:['Soporte básico','Instalación de SO','Formateos'],desc:'Estás comenzando tu camino. Recibirás solicitudes de soporte básico.'},
-              mid:{icon:'⚙️',label:'Mid-Level',color:'sky',chips:['Diagnóstico avanzado','Redes domésticas','Reparación hardware'],desc:'Buen nivel técnico. Recibirás solicitudes intermedias.'},
-              senior:{icon:'🚀',label:'Senior',color:'green',chips:['Servidores','Redes empresariales','Proyectos TI','Seguridad'],desc:'Excelente dominio técnico. Recibirás solicitudes avanzadas.'}};
+    const ld={junior:{icon:'🌱',label:'Junior',color:'yellow',chips:['Soporte básico','Instalación de SO','Formateos'],desc:'Estás comenzando tu camino. Recibirás solicitudes de soporte básico.'},mid:{icon:'⚙️',label:'Mid-Level',color:'sky',chips:['Diagnóstico avanzado','Redes domésticas','Reparación hardware'],desc:'Buen nivel técnico. Recibirás solicitudes intermedias.'},senior:{icon:'🚀',label:'Senior',color:'green',chips:['Servidores','Redes empresariales','Proyectos TI','Seguridad'],desc:'Excelente dominio técnico. Recibirás solicitudes avanzadas.'}};
     const d=ld[state.nivel];
     const chipHtml=d.chips.map(c=>`<span class="level-chip ${d.color}">${c}</span>`).join('');
     const resultHtml=`<div class="level-result-container"><div class="level-result-header"><div class="level-badge ${state.nivel}" style="display:inline-flex; flex-direction:column; align-items:center; gap:8px; border-radius:24px; padding:32px 48px; margin-bottom:24px; background:rgba(251,191,36,.06); border:2px solid rgba(251,191,36,.3);"><span class="level-icon">${d.icon}</span><span class="level-title" style="font-size:2rem; font-weight:800">${d.label}</span><span class="level-score">${state.testScore}/${testPreguntas.length} · ${Math.round(pct)}%</span></div><p class="level-desc" style="margin-bottom:0; margin-top:16px">${d.desc}</p></div><div class="level-bars"><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Rendimiento por área</div><div class="level-bar-row"><span class="level-bar-label">Hardware</span><div class="level-bar-track"><div class="level-bar-fill hw" style="width:${Math.round(pct)}%"></div></div><span class="level-bar-val" style="color:var(--c-violet)">${Math.round(pct)}%</span></div><div class="level-bar-row"><span class="level-bar-label">Software</span><div class="level-bar-track"><div class="level-bar-fill sw" style="width:${Math.round(pct)}%"></div></div><span class="level-bar-val" style="color:var(--c-sky)">${Math.round(pct)}%</span></div><div class="level-bar-row"><span class="level-bar-label">Redes</span><div class="level-bar-track"><div class="level-bar-fill net" style="width:${Math.round(pct)}%"></div></div><span class="level-bar-val" style="color:var(--c-green)">${Math.round(pct)}%</span></div></div><div class="level-type-chips">${chipHtml}</div></div><button class="btn-violet" style="margin:20px auto 0; display:flex" onclick="window.nextStep(5)">Ver mi perfil provisional →</button>`;
@@ -1121,7 +1143,7 @@ select.field-input option{background:var(--surface2)}
     document.getElementById('test-result-container').style.display='block';
   }
   
-  // Construcción de perfil y envío a Supabase (simplificado pero funcional)
+  // Construcción de perfil y envío a Supabase
   function buildProfile() {
     const nombre = document.getElementById('f-nombre').value || '';
     const apellido = document.getElementById('f-apellido').value || '';
@@ -1164,7 +1186,7 @@ select.field-input option{background:var(--surface2)}
         nivel: state.nivel || null, test_score: state.testScore || null, estado: 'pendiente'
       }]);
       if (error) throw error;
-      // Enviar correo de confirmación usando EmailJS
+      // Enviar correo de confirmación con EmailJS
       if (window.emailjs && EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'TU_PUBLIC_KEY_AQUI') {
         emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
           to_name: (nombre + ' ' + apellido).trim() || 'Profesional',
@@ -1201,13 +1223,6 @@ select.field-input option{background:var(--surface2)}
   window.closeSendOverlay = function() {
     document.getElementById('send-overlay').classList.remove('open');
   };
-  
-  // ========== REGISTRO DE SOLICITUD DE CLIENTE ==========
-  async function registrarSolicitud(servicio, categoria, descripcion) {
-    try {
-      await supabaseClient.from('solicitudes').insert([{ servicio, categoria, descripcion, estado: 'nueva' }]);
-    } catch (err) { console.error('Error registrando solicitud:', err); }
-  }
   
   // ========== PANEL DE ADMIN ==========
   let adminProfesionales = [];
@@ -1351,7 +1366,7 @@ select.field-input option{background:var(--surface2)}
     });
   };
   
-  // Inicialización
+  // ========== INICIALIZACIÓN ==========
   document.addEventListener('DOMContentLoaded', () => {
     observeFu(document.getElementById('page-home'));
     cargarContadores();
@@ -1360,7 +1375,7 @@ select.field-input option{background:var(--surface2)}
 })();
 </script>
 
-<!-- Modales (WA, send, inscripción) -->
+<!-- Modales -->
 <div class="wa-modal-overlay" id="wa-modal-overlay" onclick="if(event.target===this)window.closeWaModal()"><div class="wa-modal"><div class="wa-modal-icon">💬</div><h3>Solicitar por WhatsApp</h3><p class="wa-modal-desc">Te conectaremos con un profesional verificado para este servicio. El pago queda retenido hasta que estés conforme.</p><div class="wa-service-pill" id="wa-service-name"></div><p style="font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:20px" id="wa-service-desc"></p><div class="wa-modal-btns"><a id="wa-btn-go" href="#" target="_blank" class="btn-green" style="justify-content:center;text-decoration:none" onclick="window.closeWaModal()">📱 Abrir WhatsApp →</a><button class="wa-btn-cancel" onclick="window.closeWaModal()">Cancelar</button></div></div></div>
 <div class="send-overlay" id="send-overlay"><div class="send-box"><div id="send-loading"><div class="send-spinner-big"></div><h3>Enviando tu registro</h3><p id="send-loading-text">Estamos enviando tus datos al equipo de Nexo para verificación.</p></div><div id="send-success-box" style="display:none"><div class="send-success-icon">✅</div><h3 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--c-green);margin-bottom:10px">🎉 Registro enviado</h3><p>Tus datos y documentos llegaron al equipo de Nexo. Revisaremos tu solicitud en <strong>24–48 horas</strong> y te notificaremos por correo cuando tu perfil esté activo.</p><div style="background:var(--surface2);border-radius:14px;padding:16px;margin-bottom:24px;font-size:.8rem;color:var(--muted)"><div>📧 Notificación enviada al equipo</div><div>📂 Documentos en revisión</div><div>⏳ Activación en 24–48 hrs</div></div><button class="btn-violet" style="width:100%;justify-content:center" onclick="window.closeSendOverlay()">Entendido →</button></div></div></div>
 <div class="inscr-overlay" id="inscr-overlay" onclick="if(event.target===this)window.cerrarModalCorreo()"><div class="inscr-modal"><button class="inscr-modal-close" onclick="window.cerrarModalCorreo()">✕</button><div class="inscr-modal-icon" id="inscr-icon">📋</div><h2 id="inscr-titulo">Inscripción profesional</h2><p class="inscr-modal-sub" id="inscr-sub">Envíanos un correo con tu nombre, especialidad y adjunta tu CV o documento de formación.</p><div class="inscr-type-pill" id="inscr-pill">🩺 Profesional de Salud</div><div class="correo-display-box" id="correo-display-box"><div class="correo-label">Escríbenos a</div><div class="correo-address" id="correo-address">nexo@ejemplo.com</div><button class="correo-copy-btn" onclick="window.copiarCorreo()"><span id="copy-icon">📋</span> <span id="copy-text">Copiar correo</span></button></div><div class="correo-instrucciones"><div class="ci-row"><span class="ci-num">1</span><span>En el <strong>asunto</strong> escribe tu nombre y área</span></div><div class="ci-row"><span class="ci-num">2</span><span>Adjunta tu <strong>CV o certificado de estudios</strong></span></div><div class="ci-row"><span class="ci-num">3</span><span>Cuéntanos brevemente tu <strong>experiencia</strong></span></div><div class="ci-row"><span class="ci-num">4</span><span>Te respondemos en <strong>24–48 horas</strong></span></div></div><div class="inscr-test-aviso" id="inscr-test-aviso">🔒 Debes completar el <strong>test de nivel</strong> (Junior/Mid/Senior) antes de enviar tu inscripción.<button onclick="window.irAlTestDesdeModal()" style="display:block;width:100%;margin-top:10px;background:var(--c-violet);color:#fff;border:none;border-radius:100px;padding:10px 16px;cursor:pointer">✏️ Ir al test de nivel ahora →</button></div><div class="inscr-test-ok" id="inscr-test-ok"></div><a class="inscr-gmail-btn" id="inscr-gmail-btn" href="#" target="_blank">✉️ Abrir Gmail y enviar correo</a><button class="inscr-modal-cancel" onclick="window.cerrarModalCorreo()">Cerrar</button></div></div>
