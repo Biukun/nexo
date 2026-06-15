@@ -412,16 +412,16 @@ select.field-input option{background:var(--surface2)}
 @media(max-width:860px){.service-cats{grid-template-columns:1fr}}
 .inscr-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(14px);z-index:400;display:none;align-items:center;justify-content:center;padding:20px}
 .inscr-overlay.open{display:flex;animation:fadeIn .2s ease}
-.inscr-modal{background:var(--surface);border:1px solid rgba(255,255,255,.09);border-radius:28px;padding:44px 38px 36px;max-width:480px;width:100%;position:relative;animation:stepIn .3s ease both;text-align:center}
+.inscr-modal{background:var(--surface);border:1px solid rgba(255,255,255,.09);border-radius:28px;padding:36px 32px 28px;max-width:440px;width:100%;max-height:calc(100vh - 40px);overflow-y:auto;position:relative;animation:stepIn .3s ease both;text-align:center}
 .inscr-modal-close{position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);border-radius:50%;width:32px;height:32px;cursor:pointer;color:var(--muted);font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .inscr-modal-close:hover{border-color:rgba(255,255,255,.25);color:var(--text)}
-.inscr-modal-icon{font-size:2.6rem;margin-bottom:14px}
+.inscr-modal-icon{font-size:2.2rem;margin-bottom:10px}
 .inscr-modal h2{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:8px;letter-spacing:-.3px}
-.inscr-modal-sub{color:var(--muted);font-size:.84rem;line-height:1.7;margin-bottom:20px}
-.inscr-type-pill{display:inline-flex;align-items:center;gap:7px;border-radius:100px;padding:5px 16px;font-size:.75rem;font-weight:600;margin:0 auto 24px}
+.inscr-modal-sub{color:var(--muted);font-size:.82rem;line-height:1.6;margin-bottom:16px}
+.inscr-type-pill{display:inline-flex;align-items:center;gap:7px;border-radius:100px;padding:5px 16px;font-size:.75rem;font-weight:600;margin:0 auto 16px}
 .inscr-type-pill.salud{background:rgba(94,245,176,.1);color:var(--c-green);border:1px solid rgba(94,245,176,.25)}
 .inscr-type-pill.tech{background:rgba(157,127,245,.1);color:var(--c-violet);border:1px solid rgba(157,127,245,.25)}
-.correo-display-box{border-radius:20px;padding:22px 24px;margin-bottom:22px;border:2px solid}
+.correo-display-box{border-radius:18px;padding:16px 20px;margin-bottom:16px;border:2px solid}
 .correo-display-box.salud{background:rgba(94,245,176,.05);border-color:rgba(94,245,176,.3)}
 .correo-display-box.tech{background:rgba(157,127,245,.05);border-color:rgba(157,127,245,.3)}
 .correo-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px;font-weight:500}
@@ -430,7 +430,7 @@ select.field-input option{background:var(--surface2)}
 .correo-display-box.tech .correo-address{color:var(--c-violet)}
 .correo-copy-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:100px;padding:8px 20px;font-size:.8rem;font-family:'DM Sans',sans-serif;color:var(--text);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
 .correo-copy-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
-.correo-instrucciones{text-align:left;display:flex;flex-direction:column;gap:10px;margin-bottom:24px;background:var(--surface2);border-radius:16px;padding:18px 20px}
+.correo-instrucciones{text-align:left;display:flex;flex-direction:column;gap:8px;margin-bottom:16px;background:var(--surface2);border-radius:14px;padding:14px 18px}
 .ci-row{display:flex;align-items:flex-start;gap:12px;font-size:.82rem;color:var(--muted);line-height:1.5}
 .ci-num{min-width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--text);flex-shrink:0;margin-top:1px}
 .ci-row strong{color:var(--text)}
