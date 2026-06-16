@@ -16,9 +16,10 @@ Marketplace de profesionales verificados en Chile — conecta clientes con **kin
   - [2. Crear el proyecto en Supabase](#2-crear-el-proyecto-en-supabase)
   - [3. Tablas y políticas (SQL)](#3-tablas-y-políticas-sql)
   - [4. Storage (subida de CV/títulos)](#4-storage-subida-de-cvtítulos)
-  - [5. Auth — usuario admin](#5-auth--usuario-admin)
+  - [5. Auth — usuarios y configuración de URLs](#5-auth--usuarios-y-configuración-de-urls)
   - [6. EmailJS (correo de confirmación)](#6-emailjs-correo-de-confirmación)
   - [7. Conectar las claves en `index.html`](#7-conectar-las-claves-en-indexhtml)
+- [Páginas y flujos](#páginas-y-flujos)
 - [Panel de administración](#panel-de-administración)
 - [Pagos / escrow (simulado)](#pagos--escrow-simulado)
 - [Esquema de datos](#esquema-de-datos)
@@ -29,11 +30,15 @@ Marketplace de profesionales verificados en Chile — conecta clientes con **kin
 
 ## Qué hace
 
-Nexo tiene tres flujos principales, todos dentro de un único `index.html` (SPA sin framework, navegación entre "páginas" con `goTo()`):
+Nexo es una SPA (Single Page Application) sin framework, contenida en un único `index.html`. La navegación entre secciones usa `goTo()` con transiciones CSS. Tiene 7 páginas internas:
 
-- **Clientes**: buscan un servicio (salud o tecnología), ven categorías con contadores reales de profesionales disponibles, y contactan directo por WhatsApp.
-- **Profesionales**: se registran en un flujo de varios pasos — datos personales, subida de documentos (CV, título, certificado/registro de Superintendencia de Salud), un bot de validación conversacional, y para el área técnica un test de 15 preguntas que los clasifica en Junior/Mid/Senior. Quedan en estado `pendiente` hasta revisión.
-- **Admin**: panel interno (`/#admin`) con login real de Supabase Auth para revisar, aprobar o rechazar profesionales registrados, y ver los documentos que subieron.
+- **`page-home`** — landing con buscador, categorías con contadores reales desde Supabase, y cards de profesionales destacados.
+- **`page-clientes`** — catálogo de servicios disponibles, filtros por categoría, y botón de contacto por WhatsApp con simulación de escrow.
+- **`page-pro`** — landing para profesionales, con descripción de nichos (salud / informática) y botones de inscripción.
+- **`page-registro`** — flujo de inscripción de 5 pasos: datos personales → documentos → bot de validación conversacional → test de nivel (solo TI, 15 preguntas, clasifica en Junior/Mid/Senior) → resumen y envío a Supabase.
+- **`page-login`** — registro e inicio de sesión de clientes y profesionales con email + contraseña (Supabase Auth). Incluye recuperación de contraseña por email.
+- **`page-perfil`** — panel del usuario autenticado: historial de solicitudes, favoritos, y estado del perfil profesional (si aplica).
+- **`page-admin`** — panel interno (`/#admin`) para revisar, aprobar o rechazar profesionales registrados.
 
 ## Stack
 
@@ -42,15 +47,20 @@ Nexo tiene tres flujos principales, todos dentro de un único `index.html` (SPA 
 - [EmailJS](https://www.emailjs.com) — correo de confirmación al profesional (100% frontend, sin backend de email)
 - Fuentes: Google Fonts (Syne + DM Sans)
 
-No hay backend propio. Todo corre en el navegador y habla directo con Supabase usando la **clave pública (publishable/anon key)**, que está pensada para ser expuesta — la seguridad real vive en las políticas RLS de Postgres (ver sección [Seguridad](#seguridad)).
+No hay backend propio. Todo corre en el navegador y habla directo con Supabase usando la **anon/legacy key** (`eyJ...`), que está pensada para ser expuesta — la seguridad real vive en las políticas RLS de Postgres (ver [Seguridad](#seguridad)).
+
+> ⚠️ La clave correcta es la **Legacy anon key** (pestaña "Legacy anon, service_role API keys" en el Dashboard de Supabase), que empieza con `eyJ...`. La nueva "Publishable key" (`sb_publishable_...`) no es compatible con `@supabase/supabase-js@2`.
 
 ## Estructura del repo
 
 ```
 .
-├── index.html              # Toda la app (HTML + CSS + JS)
-├── setup_supabase.sql      # SQL inicial: columnas reg_super/documentos, RLS de profesionales, storage policy
-├── setup_supabase_v2.sql   # SQL adicional: tabla pagos, columnas extra de solicitudes
+├── index.html               # Toda la app (HTML + CSS + JS)
+├── setup_supabase.sql       # SQL v1: columnas reg_super/documentos, RLS profesionales, storage policy
+├── setup_supabase_v2.sql    # SQL v2: tabla pagos, columnas extra de solicitudes, RLS pagos
+├── setup_auth_v3.sql        # SQL v3: tabla favoritos, RLS actualizado con auth de usuarios
+├── fix_rls_solicitudes.sql  # SQL auxiliar: diagnóstico y corrección de RLS en solicitudes
+├── CONTRIBUTING.md
 └── README.md
 ```
 
@@ -58,7 +68,7 @@ No hay backend propio. Todo corre en el navegador y habla directo con Supabase u
 
 ### 1. Clonar y servir
 
-No requiere build. Para desarrollo local basta con servir el archivo (no abrirlo con `file://` directamente, porque algunas APIs del navegador y CORS de Supabase se comportan distinto):
+No requiere build. Para desarrollo local sirve el archivo directamente (no abrir con `file://` — CORS de Supabase falla):
 
 ```bash
 git clone <url-del-repo>
@@ -72,52 +82,69 @@ Para producción, cualquier hosting estático sirve (GitHub Pages, Vercel, Netli
 ### 2. Crear el proyecto en Supabase
 
 1. Crea una cuenta en [supabase.com](https://supabase.com) y un nuevo proyecto.
-2. Anota la **Project URL** y la **anon/publishable key** (Settings → API). Las vas a necesitar en el paso 7.
-3. En el Table Editor, crea las tablas base si no existen: `profesionales` y `solicitudes`. Como mínimo, `profesionales` necesita: `id` (identity/PK), `nombre`, `apellido`, `email`, `telefono`, `region`, `tipo`, `especialidad`, `nivel`, `test_score`, `estado` (default `'pendiente'`). `solicitudes` necesita: `id`, `servicio`, `categoria`, `descripcion`, `estado`.
+2. Ve a **Settings → API → Legacy anon, service_role API keys** y copia la **anon key** (`eyJ...`). La vas a necesitar en el paso 7.
+3. En el Table Editor, crea las tablas base `profesionales` y `solicitudes` con al menos estas columnas:
+   - `profesionales`: `id` (identity PK), `nombre`, `apellido`, `email`, `telefono`, `region`, `tipo`, `especialidad`, `nivel`, `test_score`, `estado` (default `'pendiente'`)
+   - `solicitudes`: `id` (identity PK), `servicio`, `categoria`, `descripcion`, `estado`
 
 ### 3. Tablas y políticas (SQL)
 
-Corre los dos archivos SQL del repo **en orden**, en Supabase → SQL Editor:
+Corre los scripts SQL del repo **en orden**, en Supabase → SQL Editor:
 
-1. **`setup_supabase.sql`** — agrega `reg_super` y `documentos` (jsonb) a `profesionales`, habilita RLS y crea las políticas para que el formulario público pueda insertar y el panel admin (autenticado) pueda leer/actualizar.
-2. **`setup_supabase_v2.sql`** — agrega columnas a `solicitudes` (`monto`, `cliente_nombre`, `cliente_email`, `cliente_telefono`), crea la tabla `pagos` con su RLS, y refuerza las políticas de `solicitudes`.
+1. **`setup_supabase.sql`** — `reg_super` y `documentos` (jsonb) en `profesionales`, RLS, policy de Storage.
+2. **`setup_supabase_v2.sql`** — tabla `pagos`, columnas extra en `solicitudes` (`monto`, `cliente_nombre`, `cliente_email`, `cliente_telefono`), RLS de pagos y solicitudes.
+3. **`setup_auth_v3.sql`** — tabla `favoritos` (clientes ↔ profesionales), RLS actualizado para que cada usuario vea solo sus propias solicitudes y favoritos.
 
-Ambos scripts son **idempotentes** (usan `IF NOT EXISTS` y manejo de `duplicate_object`), así que correrlos de nuevo no rompe nada si ya aplicaste parte.
+Todos son **idempotentes** — se pueden correr más de una vez sin romper nada.
+
+Si después de correrlos sigues viendo errores RLS en consola, corre `fix_rls_solicitudes.sql` para diagnosticar y reparar las políticas de `solicitudes`.
 
 ### 4. Storage (subida de CV/títulos)
 
 1. Storage → New bucket → nombre **`documentos`** → marcar como **público**.
-2. La política de Storage para permitir subidas desde el formulario (clave anon) ya está incluida en `setup_supabase.sql`. Si por alguna razón el bucket no acepta subidas, revisa Storage → Policies → bucket `documentos` y confirma que existe una policy de `INSERT` para el rol `anon`.
+2. La policy de Storage para `anon` ya está en `setup_supabase.sql`. Si el bucket rechaza subidas, ve a Storage → Policies → `documentos` y confirma que existe una policy `INSERT` para `anon`.
 
-> ⚠️ El bucket es público: cualquiera con la URL de un archivo puede verlo. Como ahí se suben CVs, títulos y números de registro de Superintendencia de Salud (datos personales), evalúa pasar a un bucket **privado con URLs firmadas** antes de tener usuarios reales. Ver [Seguridad](#seguridad).
+> ⚠️ Bucket público: cualquiera con la URL directa puede ver los archivos. Como se suben CVs, títulos y números de registro de Superintendencia de Salud, evalúa pasar a bucket **privado con URLs firmadas** antes de tener usuarios reales.
 
-### 5. Auth — usuario admin
+### 5. Auth — usuarios y configuración de URLs
 
-El panel de `/#admin` usa Supabase Auth (login con correo y contraseña), no una contraseña hardcodeada.
-
+**Usuario admin (panel interno):**
 1. Authentication → Users → **Add user**.
-2. Ingresa el correo y contraseña que vas a usar para entrar al panel.
-3. Marca **Auto Confirm User** para no tener que confirmar por correo.
+2. Ingresa correo y contraseña del admin.
+3. Marca **Auto Confirm User**.
 
-Cualquier usuario que crees ahí puede entrar al panel admin (las políticas RLS le dan acceso de lectura/escritura a `profesionales` por ser `authenticated`). Si vas a tener varios admins, créalos todos acá.
+**Usuarios clientes/profesionales** se crean solos desde `page-login` del sitio. Reciben un email de confirmación automático de Supabase antes de poder ingresar.
 
-### 6. EmailJS (correo de confirmación)
+**Configuración de URLs — paso crítico:**
 
-EmailJS envía un correo al profesional cuando su registro se guarda ("recibimos tu solicitud, te avisamos en 24-48h").
+Sin esto, los links de confirmación de email y recuperación de contraseña redirigen a `localhost` y el usuario termina en una página en blanco.
 
-1. Crea una cuenta gratis en [emailjs.com](https://www.emailjs.com) (plan free: ~200 correos/mes).
-2. Email Services → conecta tu cuenta de Gmail → copia el **Service ID**.
-3. Email Templates → crea un template con variables `{{to_name}}`, `{{to_email}}`, `{{tipo}}` → copia el **Template ID**.
-4. Account → General → copia tu **Public Key**.
+1. Authentication → **URL Configuration**
+2. **Site URL**: `https://biukun.github.io/nexo/`
+3. **Redirect URLs**: agregar `https://biukun.github.io/nexo/`
+
+Si cambias de dominio en el futuro, actualiza estos dos valores.
+
+**Confirmar email requerido (recomendado):**
+Authentication → Providers → Email → **Confirm email: ON**
+
+### 6. EmailJS (correo de confirmación al profesional)
+
+EmailJS envía un correo cuando un profesional completa el registro ("recibimos tu solicitud, te avisamos en 24-48h"). Esto es distinto al email de confirmación de cuenta que maneja Supabase directamente.
+
+1. Cuenta gratis en [emailjs.com](https://www.emailjs.com) (~200 correos/mes).
+2. Email Services → conecta Gmail → copia el **Service ID**.
+3. Email Templates → crea template con variables `{{to_name}}`, `{{to_email}}`, `{{tipo}}` → copia el **Template ID**.
+4. Account → General → copia la **Public Key**.
 
 ### 7. Conectar las claves en `index.html`
 
-Todas las claves están declaradas juntas cerca del inicio del `<script>` principal:
+Todas las claves están juntas al inicio del `<script>` principal:
 
 ```js
 // Configuración Supabase
 const SUPABASE_URL = 'https://TU-PROYECTO.supabase.co';
-const SUPABASE_KEY = 'tu-anon-key-aqui';
+const SUPABASE_KEY = 'eyJ...'; // Legacy anon key
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const STORAGE_BUCKET = 'documentos';
 
@@ -127,30 +154,50 @@ const EMAILJS_SERVICE_ID = 'tu-service-id-aqui';
 const EMAILJS_TEMPLATE_ID = 'tu-template-id-aqui';
 ```
 
-Reemplaza los 6 valores con los de tu proyecto de Supabase y tu cuenta de EmailJS. Si dejas los placeholders de EmailJS sin cambiar (`'TU_PUBLIC_KEY_AQUI'`), el sitio funciona igual pero no envía el correo de confirmación — falla en silencio.
+Si dejas los placeholders de EmailJS sin cambiar, el sitio funciona pero no envía el correo de confirmación al profesional — falla en silencio.
 
-El correo de contacto del equipo (`contact.us.nexo@gmail.com`) aparece hardcodeado en 3 lugares (botón de Gmail del modal de inscripción, texto visible, y la función `copiarCorreo`). Búscalo y reemplázalo si cambia.
+El correo de contacto (`contact.us.nexo@gmail.com`) aparece hardcodeado en 3 lugares del HTML. Si cambia, búscalo y reemplaza los 3.
 
 ---
 
-## Panel de administración
+## Páginas y flujos
 
-- Accede vía `tusitio.cl/index.html#admin` o desde el link discreto "admin" en el footer del home.
-- Login con el usuario creado en el paso 5.
-- Filtra profesionales por `pendiente` / `aprobado` / `rechazado` / `todos`.
-- Cada tarjeta muestra los datos del registro, el documento(s) adjunto(s) (links al bucket de Storage), y botones para aprobar/rechazar.
-- Aprobar/rechazar actualiza `estado` en `profesionales` y recalcula los contadores de categorías en la home.
+### Login / Registro (`page-login`)
+
+- Tabs: **Iniciar sesión** / **Crear cuenta**
+- Al registrarse, el usuario elige tipo: **Cliente** (busca servicios) o **Profesional** (ofrece servicios)
+- Supabase envía email de confirmación automáticamente — el usuario no puede ingresar hasta confirmar
+- Recuperación de contraseña vía link al correo (redirige de vuelta al sitio con el token)
+- El botón de usuario (inicial del nombre o "Ingresar") aparece en las navbars de home, clientes y pro
+
+### Perfil de usuario (`page-perfil`)
+
+- **Historial**: solicitudes donde `cliente_email` coincide con el email del usuario autenticado
+- **Favoritos**: profesionales guardados (tabla `favoritos`); se pueden quitar con ✕
+- **Mi perfil profesional** (solo visible para tipo `pro`): estado de la solicitud de inscripción, datos registrados, nivel del test técnico
+
+### Panel de administración (`page-admin`)
+
+- Accede vía `/#admin` o el link discreto "admin" en el footer del home
+- Login con el usuario admin creado en el paso 5
+- Filtra por `pendiente` / `aprobado` / `rechazado` / `todos`
+- Cada tarjeta muestra datos completos + links a los documentos en Storage
+- Aprobar/rechazar actualiza `estado` en `profesionales` y recalcula los contadores de categorías en la home
+
+---
 
 ## Pagos / escrow (simulado)
 
-El botón "simular pago" en la página de clientes:
+El botón "simular pago" en `page-clientes`:
 
 1. Pide nombre, correo y teléfono con `prompt()`.
 2. Crea una fila en `solicitudes` con estado `pendiente_pago`.
-3. Crea una fila en `pagos` con estado `retenido` (monto, comisión fija de $2.000 CLP, monto al profesional).
-4. Si confirmas que el servicio se completó, actualiza `solicitudes` a `completado` y `pagos` a `liberado`.
+3. Crea una fila en `pagos` con estado `retenido` (monto, comisión fija $2.000 CLP, monto al profesional).
+4. Si confirmas que el servicio se completó, actualiza ambas tablas a `completado` / `liberado`.
 
-**Esto es una demo, no un sistema de pagos.** No hay dinero real moviéndose — es solo para mostrar el flujo de escrow. Antes de manejar pagos reales hay que reemplazar este flujo por un backend (Supabase Edge Function o similar) integrado con un procesador real (Flow, Mercado Pago, Webpay), que sea el único capaz de escribir en `pagos`.
+**Esto es una demo.** No hay dinero real. Antes de manejar pagos reales hay que reemplazar este flujo con un backend (Supabase Edge Function) integrado con un procesador real (Flow, Mercado Pago, Webpay). La comisión de $2.000 también es provisional — sujeta a la estructura legal definitiva de Nexo.
+
+---
 
 ## Esquema de datos
 
@@ -165,7 +212,7 @@ El botón "simular pago" en la página de clientes:
 | reg_super | text | nº de registro Superintendencia de Salud (solo `salud`) |
 | documentos | jsonb | `{ "cv-tech": "https://...", "doc-tech": "https://..." }` |
 | nivel | text | `'junior'` \| `'mid'` \| `'senior'` (solo `tech`, según test) |
-| test_score | int | puntaje del test de nivel (sobre 15) |
+| test_score | int | puntaje del test (sobre 15) |
 | estado | text | `'pendiente'` \| `'aprobado'` \| `'rechazado'` |
 
 **`solicitudes`**
@@ -187,17 +234,32 @@ El botón "simular pago" en la página de clientes:
 | monto, comision, monto_profesional | numeric | |
 | estado | text | `'retenido'` \| `'liberado'` |
 
+**`favoritos`**
+
+| columna | tipo | notas |
+|---|---|---|
+| id | bigint identity | PK |
+| cliente_id | uuid | FK → `auth.users(id)` |
+| profesional_id | bigint | FK → `profesionales(id)` |
+| unique | (cliente_id, profesional_id) | evita duplicados |
+
+---
+
 ## Limitaciones conocidas / TODO
 
-- Pagos simulados, sin procesador real (ver arriba).
-- Bucket de Storage público — datos personales (CVs, títulos, RUTs) accesibles por URL directa si alguien la consigue.
-- No hay rate-limiting ni captcha en el formulario público — alguien podría hacer spam de registros/uploads.
-- El mapeo de categorías de la home (`categoryMap`, en el script) hacia `especialidad` es aproximado, no 1:1. Si se necesita precisión exacta, conviene agregar una columna `categoria` que el profesional elija directamente al registrarse.
+- Pagos simulados, sin procesador real.
+- Bucket de Storage público — CVs y títulos accesibles por URL directa.
+- Sin rate-limiting ni captcha en formularios públicos.
+- Mapeo de categorías en home (`categoryMap`) es aproximado. Para precisión exacta, agregar columna `categoria` al formulario de registro.
+- El panel admin da acceso a cualquier usuario `authenticated` — no distingue entre usuarios normales y admins. Para producción real, agregar un check de rol explícito (columna `role` en una tabla `perfiles`, o usar claims de Supabase Auth).
 - Sin tests automatizados.
+
+---
 
 ## Seguridad
 
-- La clave de Supabase en `index.html` es la **anon/publishable key** — está diseñada para ser pública. La protección real son las políticas de **Row Level Security (RLS)** definidas en los scripts SQL: el rol `anon` solo puede insertar (no leer/listar todo), y solo usuarios `authenticated` (admins) pueden leer y actualizar.
-- Si modificas las tablas o agregas otras nuevas, recuerda habilitar RLS y escribir las políticas correspondientes — sin RLS, una tabla con la anon key es de libre lectura/escritura para cualquiera.
-- La clave pública de EmailJS también está pensada para exponerse en frontend; el límite real lo da tu plan (200 correos/mes en el free tier).
-- No subas al repo ninguna clave que **no** sea explícitamente pública (service role key de Supabase, claves privadas, etc.). Si en algún momento se agrega una Edge Function o un backend, esas credenciales van en variables de entorno del lado servidor, nunca en este archivo.
+- La clave en `index.html` es la **anon/legacy key** — diseñada para ser pública. La protección real son las **políticas RLS** de cada tabla.
+- Sin RLS, cualquier tabla es de libre lectura/escritura con la anon key. Siempre habilita RLS al crear tablas nuevas.
+- El panel admin usa Supabase Auth — cualquier usuario `authenticated` puede ingresar. Para mayor seguridad, usa claims o una tabla de roles explícita.
+- La clave pública de EmailJS puede exponerse; el límite es el plan (200 correos/mes en free).
+- Nunca subas al repo la **service role key** ni claves privadas. Si en algún momento se agrega una Edge Function, sus credenciales van en variables de entorno del servidor.
