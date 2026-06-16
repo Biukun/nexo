@@ -489,6 +489,75 @@ select.field-input option{background:var(--surface2)}
   .profile-card-header{flex-direction:column;align-items:flex-start}
   .prog-label{display:none}
 }
+/* ── AUTH: login/registro y perfil ───────────────────────────── */
+.auth-blobs .blob:nth-child(1){width:440px;height:440px;background:var(--c-green);top:-140px;right:-80px;opacity:.08}
+.auth-blobs .blob:nth-child(2){width:300px;height:300px;background:var(--c-violet);bottom:8%;left:-60px;opacity:.07;animation-delay:-9s}
+.auth-container{max-width:440px;margin:0 auto;padding:60px 28px 80px}
+.auth-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;background:linear-gradient(135deg,var(--c-green),var(--c-violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:32px;cursor:pointer}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:36px 32px}
+.auth-tabs{display:flex;background:var(--surface2);border-radius:100px;padding:4px;margin-bottom:28px;gap:4px}
+.auth-tab{flex:1;border:none;background:transparent;border-radius:100px;padding:9px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .2s}
+.auth-tab.active{background:var(--surface);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.auth-divider{text-align:center;color:var(--muted);font-size:.78rem;margin:16px 0;position:relative}
+.auth-divider::before,.auth-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border)}
+.auth-divider::before{left:0}.auth-divider::after{right:0}
+.auth-error{color:var(--c-red);font-size:.82rem;margin-bottom:14px;display:none;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:10px 14px}
+.auth-error.visible{display:block}
+.auth-success{color:var(--c-green);font-size:.85rem;margin-bottom:14px;display:none;background:rgba(94,245,176,.07);border:1px solid rgba(94,245,176,.2);border-radius:10px;padding:12px 16px;line-height:1.6}
+.auth-success.visible{display:block}
+.auth-footer{text-align:center;margin-top:20px;font-size:.82rem;color:var(--muted)}
+.auth-footer a{color:var(--c-violet);cursor:pointer;text-decoration:none}
+.auth-footer a:hover{text-decoration:underline}
+.auth-tipo-sel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.auth-tipo-btn{border:1px solid var(--border);border-radius:14px;padding:14px 10px;background:var(--surface2);cursor:pointer;font-family:'DM Sans',sans-serif;text-align:center;transition:all .2s;color:var(--muted);font-size:.82rem}
+.auth-tipo-btn:hover{border-color:var(--c-violet);color:var(--text)}
+.auth-tipo-btn.selected.cliente{border-color:var(--c-green);background:rgba(94,245,176,.07);color:var(--c-green)}
+.auth-tipo-btn.selected.pro{border-color:var(--c-violet);background:rgba(157,127,245,.07);color:var(--c-violet)}
+.auth-tipo-btn .tipo-ico{font-size:1.5rem;display:block;margin-bottom:6px}
+.auth-tipo-btn strong{display:block;font-weight:600;font-size:.85rem;margin-bottom:2px}
+/* ── PERFIL DE USUARIO ───────────────────────────────────────── */
+.perfil-blobs .blob:nth-child(1){width:400px;height:400px;background:var(--c-violet);top:-120px;left:-80px;opacity:.08}
+.perfil-blobs .blob:nth-child(2){width:280px;height:280px;background:var(--c-green);bottom:10%;right:-60px;opacity:.06;animation-delay:-4s}
+.perfil-container{max-width:760px;margin:0 auto;padding:48px 28px 80px}
+.perfil-header{display:flex;align-items:center;gap:20px;margin-bottom:36px;flex-wrap:wrap}
+.perfil-avatar{width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,var(--c-green),var(--c-violet));display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-family:'Syne',sans-serif;font-weight:800;color:#000;flex-shrink:0}
+.perfil-info h2{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-.3px;margin-bottom:3px}
+.perfil-info span{font-size:.8rem;color:var(--muted)}
+.perfil-badge{display:inline-flex;align-items:center;gap:6px;border-radius:100px;padding:3px 12px;font-size:.72rem;font-weight:600;margin-left:10px}
+.perfil-badge.cliente{background:rgba(94,245,176,.1);color:var(--c-green);border:1px solid rgba(94,245,176,.25)}
+.perfil-badge.pro{background:rgba(157,127,245,.1);color:var(--c-violet);border:1px solid rgba(157,127,245,.25)}
+.perfil-tabs{display:flex;gap:6px;margin-bottom:28px;border-bottom:1px solid var(--border);padding-bottom:0}
+.perfil-tab{background:none;border:none;border-bottom:2px solid transparent;padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--muted);cursor:pointer;transition:all .2s;margin-bottom:-1px}
+.perfil-tab.active{color:var(--c-violet);border-bottom-color:var(--c-violet)}
+.perfil-tab:hover{color:var(--text)}
+.perfil-section{display:none}
+.perfil-section.active{display:block;animation:stepIn .3s ease both}
+.historial-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hc-ico{font-size:1.4rem;width:42px;height:42px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hc-info{flex:1;min-width:160px}
+.hc-info strong{display:block;font-size:.9rem;font-family:'Syne',sans-serif;font-weight:700;margin-bottom:2px}
+.hc-info span{font-size:.78rem;color:var(--muted)}
+.hc-estado{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;border-radius:100px;padding:3px 12px;flex-shrink:0}
+.hc-estado.nueva{background:rgba(251,191,36,.1);color:var(--c-yellow);border:1px solid rgba(251,191,36,.25)}
+.hc-estado.pendiente_pago{background:rgba(59,196,245,.1);color:var(--c-sky);border:1px solid rgba(59,196,245,.25)}
+.hc-estado.completado{background:rgba(94,245,176,.1);color:var(--c-green);border:1px solid rgba(94,245,176,.25)}
+.hc-fecha{font-size:.72rem;color:var(--muted);flex-shrink:0}
+.favoritos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.fav-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;transition:all .25s}
+.fav-card:hover{border-color:rgba(157,127,245,.25);transform:translateY(-2px)}
+.fav-avatar{width:44px;height:44px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.fav-info{flex:1;min-width:0}
+.fav-info strong{display:block;font-size:.88rem;font-family:'Syne',sans-serif;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fav-info span{font-size:.75rem;color:var(--muted)}
+.fav-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:4px;border-radius:8px;transition:all .2s;flex-shrink:0}
+.fav-remove:hover{color:var(--c-red)}
+.perfil-pro-estado{border-radius:18px;padding:22px 24px;margin-bottom:24px}
+.perfil-pro-estado.pendiente{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2)}
+.perfil-pro-estado.aprobado{background:rgba(94,245,176,.05);border:1px solid rgba(94,245,176,.2)}
+.perfil-pro-estado.rechazado{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.2)}
+.perfil-empty{text-align:center;padding:48px 20px;color:var(--muted);font-size:.9rem}
+.perfil-empty .empty-ico{font-size:2.4rem;margin-bottom:12px}
+@media(max-width:600px){.favoritos-grid{grid-template-columns:1fr}.historial-card{flex-direction:column;align-items:flex-start}}
 </style>
 </head>
 <body>
@@ -496,10 +565,12 @@ select.field-input option{background:var(--surface2)}
 <div class="client-blobs" style="display:none"><div class="blob"></div><div class="blob"></div></div>
 <div class="pro-blobs" style="display:none"><div class="blob"></div><div class="blob"></div></div>
 <div class="reg-blobs" style="display:none"><div class="blob"></div><div class="blob"></div></div>
+<div class="auth-blobs" style="display:none"><div class="blob"></div><div class="blob"></div></div>
+<div class="perfil-blobs" style="display:none"><div class="blob"></div><div class="blob"></div></div>
 
 <!-- ================= PAGE HOME ================= -->
 <div class="page active" id="page-home">
-  <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo">Nexo</div><div style="display:flex;align-items:center;gap:12px"><span style="color:var(--muted);font-size:.78rem">Llegando pronto &middot; Chile 2026</span><button class="theme-btn" id="theme-toggle" onclick="window.toggleTheme()" aria-label="Cambiar tema"><span id="theme-icon">☀️</span> <span id="theme-label">Claro</span></button></div></div></nav>
+  <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo">Nexo</div><div style="display:flex;align-items:center;gap:10px"><span style="color:var(--muted);font-size:.78rem">Llegando pronto &middot; Chile 2026</span><button class="theme-btn" id="theme-toggle" onclick="window.toggleTheme()" aria-label="Cambiar tema"><span id="theme-icon">☀️</span> <span id="theme-label">Claro</span></button><button class="nav-back" id="nav-user-btn-home" onclick="window.irAlPerfilOLogin()" style="display:none"></button></div></div></nav>
   <main><div class="wrap"><div class="home-hero">
     <div class="home-badge"><div class="dot"></div>Plataforma en lanzamiento &nbsp;&middot;&nbsp;<span>Chile 2026</span></div>
     <h1>Encuentra al experto.<br><span class="word-nexo">Nexo</span> te conecta.</h1>
@@ -554,9 +625,7 @@ select.field-input option{background:var(--surface2)}
 <!-- ================= PAGE CLIENTES (con simulación de pago) ================= -->
 <div class="page" id="page-clientes">
   <div class="client-blobs"><div class="blob"></div><div class="blob"></div></div>
-  <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo" onclick="window.goTo('page-home')" style="cursor:pointer">Nexo</div><div style="display:flex;gap:8px;align-items:center"><button class="theme-btn" onclick="window.toggleTheme()" aria-label="Cambiar tema">🌓</button><button class="nav-back" onclick="window.goTo('page-home')"><span>&larr;</span> Volver al inicio</button></div></div></nav>
-  <main><div class="wrap">
-    <div class="client-hero">
+  <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo" onclick="window.goTo('page-home')" style="cursor:pointer">Nexo</div><div style="display:flex;gap:8px;align-items:center"><button class="theme-btn" onclick="window.toggleTheme()" aria-label="Cambiar tema">🌓</button><button class="nav-back" id="nav-user-btn-clientes" onclick="window.irAlPerfilOLogin()" style="display:none"></button><button class="nav-back" onclick="window.goTo('page-home')"><span>&larr;</span> Volver al inicio</button></div></div></nav>
       <div class="client-hero-text fu"><div class="eyebrow-g">👤 Para clientes</div><h1>Encuentra al profesional que necesitas, <span style="color:var(--c-green)">hoy.</span></h1><p>Conéctate con kinesiólogos titulados y técnicos verificados. Tu pago queda retenido hasta que el trabajo quede perfecto.</p></div>
       <div class="client-hero-visual fu"><div class="mini-service-card" style="animation-delay:.1s"><div class="ms-icon">💻</div><div class="ms-info"><h5>Reparación de PC</h5><span>Técnico a domicilio u online</span></div><span class="ms-badge">Disponible</span></div><div class="mini-service-card" style="animation-delay:.2s"><div class="ms-icon">🩻</div><div class="ms-info"><h5>Kinesiología</h5><span>A domicilio · Titulados inscritos</span></div><span class="ms-badge">Disponible</span></div><div class="mini-service-card" style="animation-delay:.3s"><div class="ms-icon">💾</div><div class="ms-info"><h5>Recuperación de datos</h5><span>Discos, pendrives, particiones</span></div><span class="ms-badge">Disponible</span></div><div class="mini-service-card" style="animation-delay:.4s"><div class="ms-icon">🌐</div><div class="ms-info"><h5>Redes y WiFi</h5><span>Instalación y configuración</span></div><span class="ms-badge">Disponible</span></div><div class="mini-service-card" style="animation-delay:.5s"><div class="ms-icon">🩺</div><div class="ms-info"><h5>Salud a domicilio</h5><span>Evaluaciones y terapias</span></div><span class="ms-badge">Disponible</span></div></div>
     </div>
@@ -608,7 +677,7 @@ select.field-input option{background:var(--surface2)}
 <!-- ================= PAGE PROFESIONALES ================= -->
 <div class="page" id="page-pro">
   <div class="pro-blobs"><div class="blob"></div><div class="blob"></div></div>
-  <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo" onclick="window.goTo('page-home')" style="cursor:pointer">Nexo</div><div style="display:flex;gap:8px;align-items:center"><button class="theme-btn" onclick="window.toggleTheme()" aria-label="Cambiar tema">🌓</button><button class="nav-back" onclick="window.goTo('page-home')"><span>&larr;</span> Volver al inicio</button></div></div></nav>
+  <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo" onclick="window.goTo('page-home')" style="cursor:pointer">Nexo</div><div style="display:flex;gap:8px;align-items:center"><button class="theme-btn" onclick="window.toggleTheme()" aria-label="Cambiar tema">🌓</button><button class="nav-back" id="nav-user-btn-pro" onclick="window.irAlPerfilOLogin()" style="display:none"></button><button class="nav-back" onclick="window.goTo('page-home')"><span>&larr;</span> Volver al inicio</button></div></div></nav>
   <main><div class="wrap">
     <div class="pro-hero"><div class="pro-hero-text fu"><div class="eyebrow-v">💼 Para profesionales</div><h1>Recibe clientes.<br>Cobra <span style="color:var(--c-violet)">seguro.</span><br>Sin burocracia.</h1><p>Inscríbete en Nexo, recibe solicitudes verificadas y cobra sin preocuparte de que te queden a deber.</p><a href="#nichos-section" class="btn-violet" onclick="document.getElementById('nichos-section').scrollIntoView({behavior:'smooth'});return false;">Ver cómo inscribirme →</a></div><div class="pro-benefits fu"><div class="benefit-row" style="animation-delay:.1s"><div class="b-icon">📲</div><div class="b-info"><h5>Solicitudes directas</h5><span>Te avisamos cuando hay un cliente para ti</span></div></div><div class="benefit-row" style="animation-delay:.2s"><div class="b-icon">🔒</div><div class="b-info"><h5>Pago garantizado</h5><span>El dinero está retenido antes de que empieces</span></div></div><div class="benefit-row" style="animation-delay:.3s"><div class="b-icon">💰</div><div class="b-info"><h5>Solo $2.000 de comisión</h5><span>Monto fijo, sin porcentajes ni sorpresas</span></div></div><div class="benefit-row" style="animation-delay:.4s"><div class="b-icon">✅</div><div class="b-info"><h5>Perfil verificado</h5><span>Más confianza, más clientes</span></div></div></div></div>
     <div style="padding:80px 0;border-top:1px solid var(--border)" id="nichos-section"><p class="slabel v fu">Elige tu categoría</p><h2 class="sh fu">¿En qué área trabajas?</h2><p class="ssub fu">Selecciona tu especialidad para comenzar el proceso de verificación e inscripción.</p><div class="nichos-grid"><div class="nicho-big salud fu"><div class="n-icon">🩺</div><div class="nicho-pill-sm">Salud</div><h3>Kinesiología &amp; Salud</h3><p>Para kinesiólogos egresados y titulados que quieren captar pacientes con pago garantizado.</p><div class="nicho-req-box"><strong>Requisito legal:</strong> Debes estar titulado e inscrito en el Registro Nacional de Prestadores de la Superintendencia de Salud.<br><br><strong>Perfil ideal:</strong> Egresados recientes y profesionales activos.</div><button class="btn-reg-salud" onclick="window.abrirModalCorreo('salud')">Inscribirme como profesional de salud →</button></div><div class="nicho-big tech fu"><div class="n-icon">💻</div><div class="nicho-pill-sm">Informática</div><h3>Servicio Técnico &amp; TI</h3><p>Para técnicos y estudiantes de informática que ofrecen soporte, mantención o desarrollo freelance.</p><div class="nicho-req-box"><strong>Sin restricción legal:</strong> Puedes ejercer desde cualquier año de carrera.<br><br><strong>Perfil ideal:</strong> Estudiantes de cualquier nivel, egresados y titulados.</div><button class="btn-reg-tech" onclick="window.abrirModalCorreo('tech')">Inscribirme como técnico en informática →</button></div></div></div>
@@ -658,6 +727,98 @@ select.field-input option{background:var(--surface2)}
       <div class="admin-header"><div><p class="slabel v" style="margin-bottom:6px">Panel de administración</p><h2 class="sh" style="margin-bottom:0">Profesionales registrados</h2></div><button class="btn-ghost" onclick="window.adminLogout()">Cerrar sesión</button></div>
       <div class="admin-filters"><button class="sf-pill active" data-estado="pendiente" onclick="window.filtrarAdmin('pendiente',this)">⏳ Pendientes</button><button class="sf-pill" data-estado="aprobado" onclick="window.filtrarAdmin('aprobado',this)">✅ Aprobados</button><button class="sf-pill" data-estado="rechazado" onclick="window.filtrarAdmin('rechazado',this)">✕ Rechazados</button><button class="sf-pill" data-estado="todos" onclick="window.filtrarAdmin('todos',this)">Todos</button></div>
       <div id="admin-list"></div>
+    </div>
+  </div></main>
+</div>
+
+<!-- ================= PAGE LOGIN / REGISTRO ================= -->
+<div class="page" id="page-login">
+  <div class="auth-blobs"><div class="blob"></div><div class="blob"></div></div>
+  <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo" onclick="window.goTo('page-home')" style="cursor:pointer">Nexo</div><div style="display:flex;gap:8px;align-items:center"><button class="theme-btn" onclick="window.toggleTheme()" aria-label="Cambiar tema">🌓</button><button class="nav-back" onclick="window.goTo('page-home')"><span>&larr;</span> Volver al inicio</button></div></div></nav>
+  <main><div class="auth-container">
+    <div class="auth-logo" onclick="window.goTo('page-home')">Nexo</div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="window.switchAuthTab('login')">Iniciar sesión</button>
+        <button class="auth-tab" id="tab-registro" onclick="window.switchAuthTab('registro')">Crear cuenta</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="auth-login-panel">
+        <div class="auth-error" id="login-error"></div>
+        <div class="auth-success" id="login-success"></div>
+        <div class="field-group"><label>Correo electrónico</label><input class="field-input" id="login-email" type="email" placeholder="tu@correo.com" onkeydown="if(event.key==='Enter')window.doLogin()"></div>
+        <div class="field-group"><label>Contraseña</label><input class="field-input" id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')window.doLogin()"></div>
+        <button class="btn-violet" style="width:100%;justify-content:center;margin-top:4px" onclick="window.doLogin()" id="btn-login">Ingresar →</button>
+        <div class="auth-footer" style="margin-top:14px"><a onclick="window.mostrarRecuperarPass()">¿Olvidaste tu contraseña?</a></div>
+      </div>
+
+      <!-- RECUPERAR CONTRASEÑA -->
+      <div id="auth-recover-panel" style="display:none">
+        <p style="color:var(--muted);font-size:.85rem;margin-bottom:18px">Ingresa tu correo y te enviaremos un link para restablecer tu contraseña.</p>
+        <div class="auth-error" id="recover-error"></div>
+        <div class="auth-success" id="recover-success"></div>
+        <div class="field-group"><label>Correo electrónico</label><input class="field-input" id="recover-email" type="email" placeholder="tu@correo.com" onkeydown="if(event.key==='Enter')window.doRecover()"></div>
+        <button class="btn-violet" style="width:100%;justify-content:center" onclick="window.doRecover()">Enviar link de recuperación →</button>
+        <div class="auth-footer" style="margin-top:14px"><a onclick="window.switchAuthTab('login')">← Volver al inicio de sesión</a></div>
+      </div>
+
+      <!-- REGISTRO -->
+      <div id="auth-registro-panel" style="display:none">
+        <div class="auth-error" id="registro-error"></div>
+        <div class="auth-success" id="registro-success"></div>
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px">¿Eres cliente o profesional?</p>
+        <div class="auth-tipo-sel">
+          <button class="auth-tipo-btn selected cliente" id="tipo-cliente" onclick="window.selTipo('cliente')"><span class="tipo-ico">🙋</span><strong>Cliente</strong><span>Busco servicios</span></button>
+          <button class="auth-tipo-btn pro" id="tipo-pro" onclick="window.selTipo('pro')"><span class="tipo-ico">💼</span><strong>Profesional</strong><span>Ofrezco servicios</span></button>
+        </div>
+        <div class="field-row">
+          <div class="field-group"><label>Nombre</label><input class="field-input" id="reg-nombre" type="text" placeholder="Tu nombre"></div>
+          <div class="field-group"><label>Apellido</label><input class="field-input" id="reg-apellido" type="text" placeholder="Tu apellido"></div>
+        </div>
+        <div class="field-group"><label>Correo electrónico</label><input class="field-input" id="reg-email" type="email" placeholder="tu@correo.com"></div>
+        <div class="field-group"><label>Contraseña <span style="color:var(--muted);font-size:.72rem;font-weight:400">(mínimo 8 caracteres)</span></label><input class="field-input" id="reg-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')window.doRegistro()"></div>
+        <button class="btn-green" style="width:100%;justify-content:center" onclick="window.doRegistro()" id="btn-registro">Crear cuenta →</button>
+        <p style="font-size:.75rem;color:var(--muted);margin-top:12px;line-height:1.6;text-align:center">Al crear una cuenta aceptas nuestros términos de uso. Recibirás un correo de confirmación.</p>
+      </div>
+    </div>
+  </div></main>
+</div>
+
+<!-- ================= PAGE PERFIL ================= -->
+<div class="page" id="page-perfil">
+  <div class="perfil-blobs"><div class="blob"></div><div class="blob"></div></div>
+  <nav class="topnav"><div class="wrap topnav-inner"><div class="nav-logo" onclick="window.goTo('page-home')" style="cursor:pointer">Nexo</div><div style="display:flex;gap:8px;align-items:center"><button class="theme-btn" onclick="window.toggleTheme()" aria-label="Cambiar tema">🌓</button><button class="nav-back" id="btn-cerrar-sesion" onclick="window.cerrarSesion()">Cerrar sesión</button><button class="nav-back" onclick="window.goTo('page-home')"><span>&larr;</span> Inicio</button></div></div></nav>
+  <main><div class="perfil-container">
+    <div class="perfil-header">
+      <div class="perfil-avatar" id="perfil-avatar">?</div>
+      <div class="perfil-info">
+        <h2 id="perfil-nombre">Cargando...</h2>
+        <span id="perfil-email-txt"></span>
+        <span class="perfil-badge cliente" id="perfil-tipo-badge">Cliente</span>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="perfil-tabs">
+      <button class="perfil-tab active" onclick="window.switchPerfilTab('historial',this)">📋 Historial</button>
+      <button class="perfil-tab" onclick="window.switchPerfilTab('favoritos',this)">❤️ Favoritos</button>
+      <button class="perfil-tab" id="tab-mi-perfil-pro" onclick="window.switchPerfilTab('miperfil',this)" style="display:none">💼 Mi perfil profesional</button>
+    </div>
+
+    <!-- HISTORIAL -->
+    <div class="perfil-section active" id="perfil-historial">
+      <div id="historial-list"><div class="perfil-empty"><div class="empty-ico">📋</div>Cargando historial...</div></div>
+    </div>
+
+    <!-- FAVORITOS -->
+    <div class="perfil-section" id="perfil-favoritos">
+      <div id="favoritos-list"><div class="perfil-empty"><div class="empty-ico">❤️</div>Cargando favoritos...</div></div>
+    </div>
+
+    <!-- MI PERFIL PRO -->
+    <div class="perfil-section" id="perfil-miperfil">
+      <div id="miperfil-content"><div class="perfil-empty"><div class="empty-ico">💼</div>Cargando...</div></div>
     </div>
   </div></main>
 </div>
@@ -1390,8 +1551,288 @@ select.field-input option{background:var(--surface2)}
     observeFu(document.getElementById('page-home'));
     cargarContadores();
     if (location.hash === '#admin') { window.goTo('page-admin'); window.checkAdminSession(); }
+    initAuth();
   });
-})();
+
+  // ══════════════════════════════════════════════════════════════
+  // SISTEMA DE AUTENTICACIÓN — Supabase Auth (email + contraseña)
+  // ══════════════════════════════════════════════════════════════
+
+  let authUser = null; // usuario activo globalmente
+
+  function initAuth() {
+    // Escuchar cambios de sesión (login, logout, token refresh)
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      authUser = session ? session.user : null;
+      actualizarNavbars();
+      if (event === 'PASSWORD_RECOVERY') {
+        // Usuario llegó desde un link de recuperación de contraseña
+        window.goTo('page-login');
+        window.switchAuthTab('login');
+        mostrarError('login-error', '⚠️ Ingresa tu nueva contraseña en el campo de abajo y haz clic en "Ingresar →"');
+      }
+    });
+    // Restaurar sesión existente al cargar
+    supabaseClient.auth.getSession().then(({ data }) => {
+      authUser = data.session ? data.session.user : null;
+      actualizarNavbars();
+    });
+  }
+
+  function actualizarNavbars() {
+    const ids = ['nav-user-btn-home','nav-user-btn-clientes','nav-user-btn-pro'];
+    ids.forEach(id => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      if (authUser) {
+        const inicial = (authUser.user_metadata?.nombre || authUser.email || '?')[0].toUpperCase();
+        btn.textContent = `👤 ${inicial}`;
+        btn.style.display = 'flex';
+      } else {
+        btn.textContent = 'Ingresar';
+        btn.style.display = 'flex';
+      }
+    });
+  }
+
+  window.irAlPerfilOLogin = function() {
+    if (authUser) {
+      cargarPerfil();
+      window.goTo('page-perfil');
+    } else {
+      window.goTo('page-login');
+    }
+  };
+
+  // ── TABS LOGIN / REGISTRO ──────────────────────────────────────
+  let authTipoSeleccionado = 'cliente';
+
+  window.switchAuthTab = function(tab) {
+    document.getElementById('auth-login-panel').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('auth-registro-panel').style.display = tab === 'registro' ? 'block' : 'none';
+    document.getElementById('auth-recover-panel').style.display = 'none';
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-registro').classList.toggle('active', tab === 'registro');
+    limpiarAuth();
+  };
+
+  window.mostrarRecuperarPass = function() {
+    document.getElementById('auth-login-panel').style.display = 'none';
+    document.getElementById('auth-recover-panel').style.display = 'block';
+    document.getElementById('auth-registro-panel').style.display = 'none';
+  };
+
+  window.selTipo = function(tipo) {
+    authTipoSeleccionado = tipo;
+    document.getElementById('tipo-cliente').className = 'auth-tipo-btn' + (tipo === 'cliente' ? ' selected cliente' : '');
+    document.getElementById('tipo-pro').className = 'auth-tipo-btn' + (tipo === 'pro' ? ' selected pro' : '');
+  };
+
+  function mostrarError(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg; el.classList.add('visible');
+  }
+  function mostrarSuccess(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = msg; el.classList.add('visible');
+  }
+  function limpiarAuth() {
+    ['login-error','login-success','registro-error','registro-success','recover-error','recover-success'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = ''; el.classList.remove('visible'); }
+    });
+  }
+
+  // ── INICIAR SESIÓN ─────────────────────────────────────────────
+  window.doLogin = async function() {
+    limpiarAuth();
+    const email = document.getElementById('login-email').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    if (!email || !pass) { mostrarError('login-error', 'Ingresa tu correo y contraseña.'); return; }
+    const btn = document.getElementById('btn-login');
+    btn.textContent = 'Ingresando...'; btn.disabled = true;
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+    btn.textContent = 'Ingresar →'; btn.disabled = false;
+    if (error) {
+      if (error.message.includes('Invalid login')) mostrarError('login-error', 'Correo o contraseña incorrectos.');
+      else if (error.message.includes('Email not confirmed')) mostrarError('login-error', '⚠️ Confirma tu correo antes de ingresar. Revisa tu bandeja de entrada.');
+      else mostrarError('login-error', error.message);
+      return;
+    }
+    // Login exitoso → perfil
+    cargarPerfil();
+    window.goTo('page-perfil');
+  };
+
+  // ── CREAR CUENTA ───────────────────────────────────────────────
+  window.doRegistro = async function() {
+    limpiarAuth();
+    const nombre = document.getElementById('reg-nombre').value.trim();
+    const apellido = document.getElementById('reg-apellido').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const pass = document.getElementById('reg-pass').value;
+    if (!nombre || !apellido) { mostrarError('registro-error', 'Ingresa tu nombre y apellido.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { mostrarError('registro-error', 'Ingresa un correo válido.'); return; }
+    if (pass.length < 8) { mostrarError('registro-error', 'La contraseña debe tener al menos 8 caracteres.'); return; }
+    const btn = document.getElementById('btn-registro');
+    btn.textContent = 'Creando cuenta...'; btn.disabled = true;
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password: pass,
+      options: { data: { nombre, apellido, tipo: authTipoSeleccionado } }
+    });
+    btn.textContent = 'Crear cuenta →'; btn.disabled = false;
+    if (error) {
+      if (error.message.includes('already registered')) mostrarError('registro-error', 'Ese correo ya tiene una cuenta. Usa "Iniciar sesión".');
+      else mostrarError('registro-error', error.message);
+      return;
+    }
+    // Si Supabase requiere confirmación de email (recomendado)
+    if (data.user && !data.session) {
+      mostrarSuccess('registro-success', `✅ <strong>¡Cuenta creada!</strong><br>Revisa tu correo <strong>${email}</strong> y haz clic en el link de confirmación para activar tu cuenta.`);
+    } else {
+      // Sin confirmación requerida → ir directo al perfil
+      cargarPerfil();
+      window.goTo('page-perfil');
+    }
+  };
+
+  // ── RECUPERAR CONTRASEÑA ───────────────────────────────────────
+  window.doRecover = async function() {
+    limpiarAuth();
+    const email = document.getElementById('recover-email').value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { mostrarError('recover-error', 'Ingresa un correo válido.'); return; }
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: location.origin + location.pathname
+    });
+    if (error) { mostrarError('recover-error', error.message); return; }
+    mostrarSuccess('recover-success', `✅ Enviamos un link de recuperación a <strong>${email}</strong>. Revisa tu bandeja (y spam).`);
+  };
+
+  // ── CERRAR SESIÓN ──────────────────────────────────────────────
+  window.cerrarSesion = async function() {
+    await supabaseClient.auth.signOut();
+    authUser = null;
+    actualizarNavbars();
+    window.goTo('page-home');
+  };
+
+  // ── PERFIL: TABS ───────────────────────────────────────────────
+  window.switchPerfilTab = function(tab, el) {
+    document.querySelectorAll('.perfil-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.perfil-section').forEach(s => s.classList.remove('active'));
+    if (el) el.classList.add('active');
+    const sec = document.getElementById('perfil-' + tab);
+    if (sec) sec.classList.add('active');
+    if (tab === 'historial') cargarHistorial();
+    if (tab === 'favoritos') cargarFavoritos();
+    if (tab === 'miperfil') cargarMiPerfilPro();
+  };
+
+  // ── CARGAR PERFIL ──────────────────────────────────────────────
+  async function cargarPerfil() {
+    if (!authUser) return;
+    const meta = authUser.user_metadata || {};
+    const nombre = [meta.nombre, meta.apellido].filter(Boolean).join(' ') || authUser.email;
+    const tipo = meta.tipo || 'cliente';
+    const inicial = nombre[0].toUpperCase();
+    document.getElementById('perfil-avatar').textContent = inicial;
+    document.getElementById('perfil-nombre').textContent = nombre;
+    document.getElementById('perfil-email-txt').textContent = authUser.email;
+    const badge = document.getElementById('perfil-tipo-badge');
+    badge.textContent = tipo === 'pro' ? '💼 Profesional' : '🙋 Cliente';
+    badge.className = 'perfil-badge ' + tipo;
+    // Mostrar tab "Mi perfil profesional" solo para profesionales
+    const tabPro = document.getElementById('tab-mi-perfil-pro');
+    if (tabPro) tabPro.style.display = tipo === 'pro' ? 'inline-block' : 'none';
+    cargarHistorial();
+  }
+
+  // ── HISTORIAL DE SOLICITUDES ────────────────────────────────────
+  async function cargarHistorial() {
+    const list = document.getElementById('historial-list');
+    if (!authUser || !list) return;
+    list.innerHTML = '<div class="perfil-empty"><div class="empty-ico">⏳</div>Cargando...</div>';
+    const { data, error } = await supabaseClient.from('solicitudes').select('*')
+      .eq('cliente_email', authUser.email).order('id', { ascending: false });
+    if (error || !data || data.length === 0) {
+      list.innerHTML = '<div class="perfil-empty"><div class="empty-ico">📋</div>Aún no tienes solicitudes registradas.</div>';
+      return;
+    }
+    list.innerHTML = data.map(s => {
+      const estados = { nueva:'nueva', pendiente_pago:'pendiente_pago', completado:'completado' };
+      const fecha = s.created_at ? new Date(s.created_at).toLocaleDateString('es-CL') : '';
+      return `<div class="historial-card">
+        <div class="hc-ico">${s.categoria === 'salud' ? '🩺' : '💻'}</div>
+        <div class="hc-info"><strong>${s.servicio || 'Servicio'}</strong><span>${s.descripcion || ''}</span></div>
+        ${s.monto ? `<span style="font-size:.82rem;color:var(--c-green);font-weight:600">$${Number(s.monto).toLocaleString('es-CL')}</span>` : ''}
+        <span class="hc-estado ${estados[s.estado] || 'nueva'}">${s.estado || 'nueva'}</span>
+        <span class="hc-fecha">${fecha}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ── FAVORITOS ──────────────────────────────────────────────────
+  async function cargarFavoritos() {
+    const list = document.getElementById('favoritos-list');
+    if (!authUser || !list) return;
+    list.innerHTML = '<div class="perfil-empty"><div class="empty-ico">⏳</div>Cargando...</div>';
+    const { data, error } = await supabaseClient.from('favoritos')
+      .select('*, profesionales(nombre, apellido, tipo, especialidad)')
+      .eq('cliente_id', authUser.id);
+    if (error || !data || data.length === 0) {
+      list.innerHTML = '<div class="perfil-empty"><div class="empty-ico">❤️</div>Aún no tienes profesionales guardados como favoritos.</div>';
+      return;
+    }
+    list.innerHTML = `<div class="favoritos-grid">${data.map(f => {
+      const p = f.profesionales || {};
+      return `<div class="fav-card">
+        <div class="fav-avatar">${p.tipo === 'salud' ? '🩺' : '💻'}</div>
+        <div class="fav-info"><strong>${p.nombre || ''} ${p.apellido || ''}</strong><span>${p.especialidad || p.tipo || ''}</span></div>
+        <button class="fav-remove" onclick="window.quitarFavorito(${f.id})" title="Quitar favorito">✕</button>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  window.quitarFavorito = async function(id) {
+    await supabaseClient.from('favoritos').delete().eq('id', id);
+    cargarFavoritos();
+  };
+
+  window.agregarFavorito = async function(profesionalId) {
+    if (!authUser) { window.goTo('page-login'); return; }
+    const { error } = await supabaseClient.from('favoritos')
+      .insert([{ cliente_id: authUser.id, profesional_id: profesionalId }]);
+    if (!error) alert('✅ Profesional guardado en favoritos.');
+  };
+
+  // ── MI PERFIL PRO ──────────────────────────────────────────────
+  async function cargarMiPerfilPro() {
+    const cont = document.getElementById('miperfil-content');
+    if (!authUser || !cont) return;
+    cont.innerHTML = '<div class="perfil-empty"><div class="empty-ico">⏳</div>Cargando...</div>';
+    const { data, error } = await supabaseClient.from('profesionales')
+      .select('*').eq('email', authUser.email).single();
+    if (error || !data) {
+      cont.innerHTML = `<div class="perfil-empty"><div class="empty-ico">⚠️</div>No encontramos un registro profesional asociado a este correo.<br><br><button class="btn-violet" onclick="window.goTo('page-registro')">Completar inscripción →</button></div>`;
+      return;
+    }
+    const estadoColor = { pendiente:'var(--c-yellow)', aprobado:'var(--c-green)', rechazado:'var(--c-red)' }[data.estado] || 'var(--muted)';
+    const estadoMsg = { pendiente:'⏳ Tu solicitud está siendo revisada. Te notificaremos por correo en 24–48 hrs.', aprobado:'✅ Tu perfil está activo y visible para clientes.', rechazado:'✕ Tu solicitud fue rechazada. Contacta al equipo para más información.' }[data.estado] || '';
+    cont.innerHTML = `<div class="perfil-pro-estado ${data.estado}"><p style="font-weight:600;color:${estadoColor};margin-bottom:6px">Estado: ${data.estado?.toUpperCase()}</p><p style="font-size:.85rem;color:var(--muted)">${estadoMsg}</p></div>
+    <div class="admin-card-body" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px 20px">
+      <div><label style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Nombre</label><span style="font-size:.9rem">${data.nombre || ''} ${data.apellido || ''}</span></div>
+      <div><label style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Tipo</label><span style="font-size:.9rem">${data.tipo === 'tech' ? '💻 Técnico/TI' : '🩺 Salud'}</span></div>
+      <div><label style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Especialidad</label><span style="font-size:.9rem">${data.especialidad || '—'}</span></div>
+      <div><label style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Región</label><span style="font-size:.9rem">${data.region || '—'}</span></div>
+      ${data.nivel ? `<div><label style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Nivel test</label><span style="font-size:.9rem">${data.nivel?.toUpperCase()} · ${data.test_score}/15</span></div>` : ''}
+      ${data.reg_super ? `<div><label style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Reg. Superintendencia</label><span style="font-size:.9rem">${data.reg_super}</span></div>` : ''}
+    </div>`;
+  }
+
+})(); // fin IIFE
 </script>
 
 <!-- Modales -->
